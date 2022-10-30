@@ -35,10 +35,10 @@ def plot_Mo_S2(xv,yv,S_color,Mo_color):
     # Sulfur atomic radius: 100 pm
     # Moldibdenum atomic radius: 139 pm
     # Change s to make them in scale
-    plt.scatter(xv[1::2,0::3],yv[1::2,0::3],color = S_color,s=1) # Sulfur
-    plt.scatter(xv[0::2,1::3],yv[0::2,1::3],color = S_color,s=1) # Sulfur
-    plt.scatter(xv[0::2,0::3],yv[0::2,0::3],color = Mo_color,s=1.39) # Molibdenum
-    plt.scatter(xv[1::2,2::3],yv[1::2,2::3],color = Mo_color,s=1.39) # Molibdenum
+    plt.scatter(xv[1::2,0::3],yv[1::2,0::3],s=5,color = S_color,) # Sulfur
+    plt.scatter(xv[0::2,1::3],yv[0::2,1::3],s=5,color = S_color,) # Sulfur
+    plt.scatter(xv[0::2,0::3],yv[0::2,0::3],s=1.39,color = Mo_color,) # Molibdenum
+    plt.scatter(xv[1::2,2::3],yv[1::2,2::3],s=1.39,color = Mo_color,) # Molibdenum
     
     return
     
@@ -89,7 +89,7 @@ def create_hex_grid(a,b,device_size,plot_grid):
         plot_Mo_S2(xv,yv,S_color,Mo_color)
 
         # Generic hexagonal grid
-        plt.scatter(xv,yv,s=1)
+        #plt.scatter(xv,yv,s=1)
         plt.xlabel ("X axis (nm)")
         plt.ylabel ("Y axis (nm)")
 

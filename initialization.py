@@ -7,6 +7,7 @@ Created on Wed Sep 14 20:15:19 2022
 
 from hex_grid import*
 from defects import*
+from hex_lattice import*
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -17,13 +18,14 @@ import matplotlib.pyplot as plt
 """ 
 a=0.639 # nm
 b=0.639 # nm
-plot_grid = True # Boolean to plot the hex grid we created
-device_size = (50 , 50) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+device_size = (15 , 15) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+atom_colors=['orange','purple'] # MoS2 -> First is Sulfur and second is Mo
 
 
-# Creation of hexagonal grid
-# xv and yv is the coordinates of the different points of the hexagonal grid
-xv,yv = create_hex_grid(a,b,device_size,plot_grid) 
+MoS2_lattice = Hexagonal_lattice(a,b,device_size,atom_colors)
+MoS2_lattice.create_hex_grid()
+xv=MoS2_lattice.xv
+yv=MoS2_lattice.yv
 
 """  
 ---------------------------------------------
@@ -42,6 +44,8 @@ distribution:
     'skewed_gaussian' --> Skewed Gaussian distribution of defects
     'triangle' --> Right triangle distribution of defects
 """
+
+
 distribution = 'uniform'
 prob_gen_defect = 0.5 # prob of generating defects --> Peak density
 fissure_region = (round(len(xv[0])/2)+1,4) # [0] middle point and [1] half width (nm)
