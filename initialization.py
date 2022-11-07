@@ -20,7 +20,7 @@ plt.rcParams["figure.dpi"] = 300 # Default value of dpi = 300
 """ 
 a=0.639 # nm
 b=0.639 # nm
-device_size = (50 , 50) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+device_size = (5 , 5) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
 atom_colors=['orange','purple','blue'] # MoS2 -> First is Sulfur, second is Mo and third Vs
 
 
@@ -56,4 +56,4 @@ fissure_region = (round(len(xv[0])/2)+1,4) # [0] middle point and [1] half width
 skewness = 12 # Skewness of the skewed Gaussian distribution
 
 Grid_states, list_dose = defect_distributions(xv,yv,prob_gen_defect,fissure_region,skewness,distribution)
-MoS2_lattice.plot_lattice(Grid_states)
+MoS2_lattice.plot_lattice(0,True)

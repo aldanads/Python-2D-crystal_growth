@@ -57,7 +57,7 @@ class Hexagonal_lattice():
             
         
     
-    def plot_lattice(self,Grid_states = 0):
+    def plot_lattice(self,Grid_states = 0,crystal_orientation = False):
         
         # Sulfur atomic radius: 100 pm
         # Moldibdenum atomic radius: 139 pm
@@ -70,7 +70,10 @@ class Hexagonal_lattice():
         if (type(Grid_states) == np.ndarray):
             coord_xy_Vs = np.where(Grid_states == 2)
             plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom3_colors,s=1)
-       
+        if (crystal_orientation == True):
+            arrow1 = plt.arrow(self.xv[2,0],self.yv[2,0],1,0,width =0.05)
+            arrow2 = plt.arrow(self.xv[2,0],self.yv[2,0],0,1,width =0.05, color = 'green')
+            plt.legend([arrow1,arrow2], ['Armchair','Zigzag'])
         plt.xlabel ("X axis (nm)")
         plt.ylabel ("Y axis (nm)")
 
@@ -86,17 +89,3 @@ class Hexagonal_lattice():
         plt.show()
 
 
-"""        
-device_size=[10,10]
-
-a=0.639 # nm
-b=0.639 # nm
-
-atom_colors=['orange','purple']
-
-MoS2_lattice = Hexagonal_lattice(a,b,device_size,atom_colors)
-
-MoS2_lattice.create_hex_grid()
-MoS2_lattice.plot_lattice()
-
-"""

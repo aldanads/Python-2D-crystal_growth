@@ -11,7 +11,23 @@ def KMC(Grid_states):
     
     return Grid_states
 
-def mig_available(Grid_states):
+def events_available(Grid_states):
+    
+    # Kink nucleation
+    
+    # Kink propagation
+    
+    """ Migration:
+        # Up - Zigzag
+        # Down - Zigzag
+        # Right up - Armchair
+        # Right down - Armchair
+        # Left up - Armchair
+        # Left down - Armchair
+        
+    """
+    
+    
     
     return
 
