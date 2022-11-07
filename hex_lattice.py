@@ -9,6 +9,8 @@ Created on Sun Oct 30 18:22:27 2022
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import skewnorm
+
 
 
 class Hexagonal_lattice():
@@ -57,7 +59,7 @@ class Hexagonal_lattice():
             
         
     
-    def plot_lattice(self,Grid_states = 0,crystal_orientation = False):
+    def plot_lattice(self,crystal_orientation = False):
         
         # Sulfur atomic radius: 100 pm
         # Moldibdenum atomic radius: 139 pm
@@ -67,12 +69,12 @@ class Hexagonal_lattice():
         plt.scatter(self.xv[0::2,0::3],self.yv[0::2,0::3],color = self.atom2_colors,s=1.39) # Molibdenum
         plt.scatter(self.xv[1::2,2::3],self.yv[1::2,2::3],color = self.atom2_colors,s=1.39) # Molibdenum
         
-        if (type(Grid_states) == np.ndarray):
-            coord_xy_Vs = np.where(Grid_states == 2)
+        if (type(self.Grid_states) == np.ndarray):
+            coord_xy_Vs = np.where(self.Grid_states == 2)
             plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom3_colors,s=1)
         if (crystal_orientation == True):
-            arrow1 = plt.arrow(self.xv[2,0],self.yv[2,0],1,0,width =0.05)
-            arrow2 = plt.arrow(self.xv[2,0],self.yv[2,0],0,1,width =0.05, color = 'green')
+            arrow1 = plt.arrow(self.xv[2,0],self.yv[2,0],self.x_axis/4,0,width =0.05)
+            arrow2 = plt.arrow(self.xv[2,0],self.yv[2,0],0,self.y_axis/4,width =0.05, color = 'green')
             plt.legend([arrow1,arrow2], ['Armchair','Zigzag'])
         plt.xlabel ("X axis (nm)")
         plt.ylabel ("Y axis (nm)")
@@ -87,5 +89,158 @@ class Hexagonal_lattice():
         plt.ylabel ("Y axis (nm)")
 
         plt.show()
+        
+        
+        """
+        -------------------- Introducing defects in the crystal ---------------
+        """
+        
+    def pristine_crystal(self):
+        
+        Grid_states=np.zeros((len(self.xv),len(self.xv[0])), dtype=int)
+        
+        Grid_states[1::2,0::3]=1 # Sulfur
+        Grid_states[0::2,1::3]=1 # Sulfur
+        Grid_states[0::2,0::3]=3 # Molibdenum
+        Grid_states[1::2,2::3]=3 # Molibdenum
+        
+        self.Grid_states = Grid_states
+        
+    def introduce_defects_j_row(self,j,prob_defects):
+        
+        counter=0
 
+        # The defects we are introducing in column j
+        prob_defects=np.random.rand(sum(self.Grid_states[:,j] == 1)) < prob_defects
+            
+        for i in np.arange(len(self.xv)):
+            if self.Grid_states[i,j] == 1:
+                
+                if prob_defects[counter]:
+                    self.Grid_states[i,j] = 2
+                
+                counter += 1
+
+    # Uniform distribution
+    def defects_row(self,prob_defects,fissure_region):
+        
+        self.pristine_crystal() # Initialize a pristine 2D MoS2 layer
+        # 1 position is sulfur and the other is Molybdenum --> there is len(xv)/2 sulfur in a column
+        
+        a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
+
+        irradiated_row = fissure_region[0] # Middle point of the triangle base
+        # Half of the triangle base
+        width_fissure = fissure_region[1]*2/a # half width of fissure region in columns
+        
+        length_xv = len(self.xv[0])
+        # If the fissure region is greater than the simulation domain, we cover the simulation domain
+        if 2 * width_fissure > length_xv:
+            start_row = 0
+            finish_row = length_xv
+        else: # The fissure region fit the simulation domain
+            # The triangle starting point in the grid
+            start_row = round(irradiated_row - width_fissure)
+            # The last point of the triangle in the grid
+            finish_row = round(irradiated_row + width_fissure)
+            
+        list_prob = np.zeros(length_xv)
+        list_prob[start_row:finish_row] = prob_defects
+        
+        self.list_prob = list_prob
+        
+        for j in np.arange(start_row,finish_row):
+            
+            self.introduce_defects_j_row(j,prob_defects)
+
+    # Skewed Gaussian distribution:
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.skewnorm.html
+    def defects_skewed_gaussian(self,prob_defects,fissure_region,skewness):
+
+        self.pristine_crystal() # Initialize a pristine 2D MoS2 layer
+
+        a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
+        
+        irradiated_row = fissure_region[0]
+        width_fissure = fissure_region[1]*2/a # width of fissure region in columns
+        length_xv = len(self.xv[0])
+
+        
+        mean = skewnorm.mean(skewness, moments='m') # mean of the distribution
+        std = skewnorm.std(skewness) # standard deviation
+        x = np.linspace(skewnorm.ppf(0.001, skewness), skewnorm.ppf(0.999, skewness), length_xv)
+        norm_const=sum(skewnorm.pdf(x, skewness)) # Normalization constant
+        prob = skewnorm.pdf(x, skewness)/norm_const # Probability density function normalized to 1
+        max_prob = max(prob) # Maximum probability found in the distribution
+        max_prob_defect = prob_defects/max_prob # Scale the distribution
+        prob = max_prob_defect*prob # We set the peak at the max probability of generating a vacancy
+        
+        list_prob = []
+        
+        for j in np.arange(0,length_xv):
+            
+            # Location of the peak density in the simulation domain
+            x=mean-(irradiated_row-j)*std/width_fissure;
+            
+            prob = max_prob_defect * skewnorm.pdf(x, skewness) / norm_const
+            
+            list_prob.append(prob)
+
+            self.introduce_defects_j_row(j,prob_defects)
+            
+        self.list_prob = list_prob
+        
+    def defect_triangle(self,prob_defects,fissure_region):
+            
+        self.pristine_crystal() # Initialize a pristine 2D MoS2 layer
+        a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
+             
+        irradiated_row = fissure_region[0] # Middle point of the triangle base
+        # Half of the triangle base
+        width_fissure = fissure_region[1]*2/a # half width of fissure region in columns
+            
+        # The triangle starting point in the grid
+        start_triangle = round(irradiated_row - width_fissure)
+        # The last point of the triangle in the grid
+        finish_triangle = round(irradiated_row + width_fissure)
+            
+        # Slope --> right triangle hypotenuse 
+        slope = prob_defects / (2 * width_fissure)
+        b = prob_defects
+            
+        list_prob = np.zeros(len(self.xv[0]))
+            
+        for j in np.arange(start_triangle,finish_triangle):
+            # Triangle hypotenuse 
+            dose=slope*(start_triangle-j)+b;
+            list_prob[j] = dose
+
+            self.introduce_defects_j_row(j,prob_defects)
+            
+        self.list_prob = list_prob
+        
+    def defect_distributions(self,prob_defects,fissure_region,skewness,distribution):
+        
+        if distribution == 'uniform':
+            self.defects_row(prob_defects,fissure_region)
+        if distribution == 'triangle':
+            self.defect_triangle(prob_defects,fissure_region)
+        if distribution == 'skewed_gaussian':
+            self.defects_skewed_gaussian(prob_defects,fissure_region,skewness)
+            
+    def adam_atom(self):
+
+        self.pristine_crystal() # Initialize a pristine 2D MoS2 layer
+        j = 0
+        length_xv = len(self.xv[0])
+        length_yv = len(self.yv[0])
+
+        if self.Grid_states[int(length_xv/2),int(length_yv/2)] == 3:
+            self.Grid_states[int(length_xv)/2,length_yv/2] = 2
+        else:
+            while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != 3:
+                j += 1
+                print(j)
+            self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = 2    
+            
 

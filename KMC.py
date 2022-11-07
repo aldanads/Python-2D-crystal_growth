@@ -24,7 +24,6 @@ def events_available(Grid_states):
         # Right down - Armchair
         # Left up - Armchair
         # Left down - Armchair
-        
     """
     
     

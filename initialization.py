@@ -49,11 +49,12 @@ distribution:
 
 
 distribution = 'uniform'
-prob_gen_defect = 0.5 # prob of generating defects --> Peak density
+prob_defects = 0.5 # prob of generating defects --> Peak density
 fissure_region = (round(len(xv[0])/2)+1,4) # [0] middle point and [1] half width (nm)
 
 # skewness parameter --> a=0 is the normal distribution
 skewness = 12 # Skewness of the skewed Gaussian distribution
 
-Grid_states, list_dose = defect_distributions(xv,yv,prob_gen_defect,fissure_region,skewness,distribution)
-MoS2_lattice.plot_lattice(0,True)
+MoS2_lattice.adam_atom()
+#MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution)
+MoS2_lattice.plot_lattice(False)
