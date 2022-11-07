@@ -7,9 +7,12 @@ Created on Mon Nov  7 17:07:32 2022
 import numpy as np
 
 
-def KMC(Grid_states):
+def KMC(MoS2_lattice):
     
-    return Grid_states
+    coord_xy_Vs = np.where(MoS2_lattice.Grid_states == 2)
+
+    
+    return MoS2_lattice
 
 def events_available(Grid_states):
     
@@ -25,6 +28,8 @@ def events_available(Grid_states):
         # Left up - Armchair
         # Left down - Armchair
     """
+    
+    
     
     
     
