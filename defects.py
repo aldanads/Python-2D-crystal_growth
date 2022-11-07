@@ -141,7 +141,6 @@ def introduce_defects_j_row(Grid_states,j,dose,xv):
         if Grid_states[i,j] == 1:
             
             if prob_defects[counter]:
-                print (i,j)
                 Grid_states[i,j] = 2
             
             counter += 1

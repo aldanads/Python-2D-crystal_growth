@@ -18,8 +18,9 @@ class Hexagonal_lattice():
         self.b = b
         self.x_axis = device_size[0]
         self.y_axis = device_size[1]
-        self.atom1_color = atom_colors[0]
-        self.atom2_color = atom_colors[1]
+        self.atom1_colors = atom_colors[0]
+        self.atom2_colors = atom_colors[1]
+        self.atom3_colors = atom_colors[2]
 
     
     def create_hex_grid(self):
@@ -56,16 +57,20 @@ class Hexagonal_lattice():
             
         
     
-    def plot_lattice(self):
+    def plot_lattice(self,Grid_states = 0):
         
         # Sulfur atomic radius: 100 pm
         # Moldibdenum atomic radius: 139 pm
         # Change s to make them in scale
-        plt.scatter(self.xv[1::2,0::3],self.yv[1::2,0::3],color = self.atom1_color,s=1) # Sulfur
-        plt.scatter(self.xv[0::2,1::3],self.yv[0::2,1::3],color = self.atom1_color,s=1) # Sulfur
-        plt.scatter(self.xv[0::2,0::3],self.yv[0::2,0::3],color = self.atom2_color,s=1.39) # Molibdenum
-        plt.scatter(self.xv[1::2,2::3],self.yv[1::2,2::3],color = self.atom2_color,s=1.39) # Molibdenum
-
+        plt.scatter(self.xv[1::2,0::3],self.yv[1::2,0::3],color = self.atom1_colors,s=1) # Sulfur
+        plt.scatter(self.xv[0::2,1::3],self.yv[0::2,1::3],color = self.atom1_colors,s=1) # Sulfur
+        plt.scatter(self.xv[0::2,0::3],self.yv[0::2,0::3],color = self.atom2_colors,s=1.39) # Molibdenum
+        plt.scatter(self.xv[1::2,2::3],self.yv[1::2,2::3],color = self.atom2_colors,s=1.39) # Molibdenum
+        
+        if (type(Grid_states) == np.ndarray):
+            coord_xy_Vs = np.where(Grid_states == 2)
+            plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom3_colors,s=1)
+       
         plt.xlabel ("X axis (nm)")
         plt.ylabel ("Y axis (nm)")
 
