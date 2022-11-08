@@ -15,7 +15,7 @@ from scipy.stats import skewnorm
 
 class Hexagonal_lattice():
     
-    def __init__(self,a,b,device_size,atom_colors,Act_E):
+    def __init__(self,a,b,device_size,atom_colors,Act_E,T):
         self.a = a
         self.b = b
         self.x_axis = device_size[0]
@@ -24,6 +24,7 @@ class Hexagonal_lattice():
         self.atom2_colors = atom_colors[1]
         self.atom3_colors = atom_colors[2]
         self.Act_E = Act_E
+        self.T = T
 
     
     def create_hex_grid(self):
@@ -241,6 +242,11 @@ class Hexagonal_lattice():
         else:
             while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != 3:
                 j += 1
-            self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = 2    
+            self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = 2 
+            
+    def coord_defects(self):
+        
+        self.n_defects = np.count_nonzero(self.Grid_states == 2)
+        self.coord_xy_defects = np.where(self.Grid_states == 2)
             
 

@@ -8,10 +8,12 @@ import numpy as np
 
 class Defects():
     
-    def __init__(self,i,j):
+    def __init__(self,i,j,Act_E):
         
         self.i = i
         self.j = j
+        self.Act_E = Act_E
+
         
     def events_available(self,Grid_states):
         
@@ -119,3 +121,23 @@ class Defects():
             if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] == 3): # Right down
                 self.allowed_events[6] = 1
         
+        
+        """
+        ________________________ TRANSITION RATES __________________________
+        """
+        
+    def TR(self,T,Grid_states):
+        
+        self.events_available(Grid_states)
+        kb = 8.6173324E-5 # Boltzmann constant
+        nu0=7E13;  # nu0 (s^-1) bond vibration frequency
+        allowed_events = self.allowed_events
+        TR = np.zeros(len(allowed_events)-1)
+            
+        TR = nu0*np.exp(-np.array(self.Act_E)/(kb*T))
+        TR[allowed_events[1:] == 0] = 0
+        self.TR = TR
+            
+            
+            
+            

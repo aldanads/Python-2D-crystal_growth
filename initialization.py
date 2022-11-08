@@ -22,12 +22,14 @@ def initialization():
     device_size = (10 , 5) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
     atom_colors=['orange','purple','blue'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
-    E_mig_armchair = 1
-    E_mig_zigzag = 1
+    # Activation energies
+    E_mig_armchair = 1 # Armchair direction
+    E_mig_zigzag = 0.7 # Zigzag direction
     
-    Act_E = [E_mig_armchair,E_mig_zigzag]
+    Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair]
     
-    
+    # Temperature
+    T = 300
     
     """  
     ---------------------------------------------
@@ -41,7 +43,7 @@ def initialization():
     """
     
     # Create MoS2 crystal
-    MoS2_lattice = Hexagonal_lattice(a,b,device_size,atom_colors,Act_E)
+    MoS2_lattice = Hexagonal_lattice(a,b,device_size,atom_colors,Act_E,T)
     MoS2_lattice.create_hex_grid()
     xv=MoS2_lattice.xv
     yv=MoS2_lattice.yv
