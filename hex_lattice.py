@@ -233,7 +233,7 @@ class Hexagonal_lattice():
 
         self.pristine_crystal() # Initialize a pristine 2D MoS2 layer
         j = 0
-        length_xv = len(self.xv[0])
+        length_xv = len(self.xv)
         length_yv = len(self.yv[0])
 
         if self.Grid_states[int(length_xv/2),int(length_yv/2)] == 3:

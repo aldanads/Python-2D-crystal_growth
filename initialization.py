@@ -21,7 +21,7 @@ def initialization():
     """ 
     a=0.639 # nm
     b=0.639 # nm
-    device_size = (5 , 5) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+    device_size = (10 , 5) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
     atom_colors=['orange','purple','blue'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
     E_mig_armchair = 1
@@ -62,8 +62,9 @@ def initialization():
     # skewness parameter --> a=0 is the normal distribution
     skewness = 12 # Skewness of the skewed Gaussian distribution
     
+    crystal_orientation = False
     MoS2_lattice.adam_atom()
     #MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution)
-    MoS2_lattice.plot_lattice(False)
+    MoS2_lattice.plot_lattice(crystal_orientation)
     
     return MoS2_lattice
