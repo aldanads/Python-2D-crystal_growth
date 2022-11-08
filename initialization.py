@@ -5,8 +5,6 @@ Created on Wed Sep 14 20:15:19 2022
 @author: ALDANADS
 """
 
-from hex_grid import*
-from defects import*
 from hex_lattice import*
 import numpy as np
 import matplotlib.pyplot as plt

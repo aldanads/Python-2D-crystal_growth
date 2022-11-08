@@ -9,5 +9,5 @@ from KMC import*
 
 MoS2_lattice = initialization()
 
-MoS2_lattice, allowed_events = KMC(MoS2_lattice)
+MoS2_lattice, Mo_adatom = KMC(MoS2_lattice)
 
