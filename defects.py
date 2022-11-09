@@ -14,7 +14,12 @@ class Defects():
         self.j = j
         self.Act_E = Act_E
 
-        
+    
+    """
+    ________________________ EVENTS AVAILABLE __________________________
+    """
+    
+    # Check possible events
     def events_available(self,Grid_states):
         
 
@@ -41,9 +46,9 @@ class Defects():
         # 2: left Mo
         # 3: right Mo
         
-        self.mig_available(Grid_states)
+        self.mig_available(Grid_states) # Migration
         
-        
+        # Function: Check possible migration routes
     def mig_available(self,Grid_states):
         
         length_x = len(Grid_states)-1
@@ -137,7 +142,107 @@ class Defects():
         TR = nu0*np.exp(-np.array(self.Act_E)/(kb*T))
         TR[allowed_events[1:] == 0] = 0
         self.TR = TR
+        
+        """
+        ________________________ PROCESSES __________________________
+        """
+        
+
+    def processes(self,Grid_states,s):
+        
+        s = s+1 # s is selected from TR, which is smaller than allowed_events
+        
+        i = self.i
+        j = self.j
+        
+        # Down - Zigzag - allowed_events[1]    
+        # Up - Zigzag - allowed_events[2]   
+        # Left up - Armchair - allowed_events[3]
+        # Left down - Armchair - allowed_events[4]
+        # Right up - Armchair - allowed_events[5]
+        # Right down - Armchair - allowed_events[6]
+        
+        if self.allowed_events[0] == 2: # Mo left (2) 
+        
+            """
+            ---------------------- Migration ----------------------------------
+            """
+        
+            if (s == 1): # Down - Zigzag
+                Grid_states[i,j] = 3
+                Grid_states[i-2,j] = 2
+                self.i = i-2
+                
+            elif (s == 2): # Up - Zigzag
+                Grid_states[i,j] = 3
+                Grid_states[i+2,j] = 2
+                self.i = i+2
+                
+            elif (s == 3): # Left up - Armchair
+                Grid_states[i,j] = 3
+                Grid_states[i+1,j-2] = 2
+                self.i = i+1
+                self.j = j-2
             
+            elif (s == 4): # Left down - Armchair
+                Grid_states[i,j] = 3
+                Grid_states[i-1,j-2] = 2
+                self.i = i-1
+                self.j = j-2
+                
+            elif (s == 5): # Right up - Armchair
+                Grid_states[i,j] = 3
+                Grid_states[i+1,j+1] = 2
+                self.i = i+1
+                self.j = j+1
+                
+            elif (s == 6): # Right down - Armchair
+                Grid_states[i,j] = 3
+                Grid_states[i-1,j+1] = 2
+                self.i = i-1
+                self.j = j+1
+        
+        elif self.allowed_events[0] == 3: # Mo right (3)
+        
+            """
+            ---------------------- Migration ----------------------------------
+            """
             
+            if (s == 1): # Down - Zigzag
+                Grid_states[i,j] = 3
+                Grid_states[i-2,j] = 2
+                self.i = i-2
+                
+            elif (s == 2): # Up - Zigzag
+                Grid_states[i,j] = 3
+                Grid_states[i+2,j] = 2
+                self.i = i+2
+                
+            elif (s == 3): # Left up - Armchair
+                Grid_states[i,j] = 3
+                Grid_states[i+1,j-1] = 2
+                self.i = i+1
+                self.j = j-1
+            
+            elif (s == 4): # Left down - Armchair
+                Grid_states[i,j] = 3
+                Grid_states[i-1,j-1] = 2
+                self.i = i-1
+                self.j = j-1
+            
+            elif (s == 5): # Right up - Armchair
+                Grid_states[i,j] = 3
+                Grid_states[i+1,j+2] = 2
+                self.i = i+1
+                self.j = j+2
+            
+            elif (s == 6): # Right down - Armchair
+                Grid_states[i,j] = 3
+                Grid_states[i-1,j+2] = 2
+                self.i = i-1
+                self.j = j+2
+            
+        return Grid_states
+    
             
             
