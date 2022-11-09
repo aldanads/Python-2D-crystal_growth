@@ -12,15 +12,17 @@ def KMC(MoS2_lattice):
     Grid_states = MoS2_lattice.Grid_states # 
     T = MoS2_lattice.T # Crystal temperature 
     MoS2_lattice.coord_defects() # Search the coordinates of every defects
-    coord_Mo = MoS2_lattice.coord_xy_defects
+    coord_Mo = MoS2_lattice.coord_xy_defects # Coordinates of Mo adatoms
+    defect_specie = MoS2_lattice.defect_specie # Defect species: 3 (Mo) or 1 (S)
+    
     for i in np.arange(len(coord_Mo[0])):
 
     
-        Mo_adatom = Defects(coord_Mo[0][i],coord_Mo[1][i],MoS2_lattice.Act_E)
+        Mo_adatom = Defects(coord_Mo[0][i],coord_Mo[1][i],MoS2_lattice.Act_E,defect_specie)
         #Mo_adatom = Defects(0,0,MoS2_lattice.Act_E)
         
-        Mo_adatom.TR(T,Grid_states)
-        TR = Mo_adatom.TR
+        Mo_adatom.TR(T,Grid_states) # Calculate the transition rates
+        TR = Mo_adatom.TR # TR
         
         # Select event
         sum_TR = sum(TR)*np.random.rand()

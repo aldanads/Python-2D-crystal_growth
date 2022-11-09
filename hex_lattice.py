@@ -223,6 +223,8 @@ class Hexagonal_lattice():
         
     def defect_distributions(self,prob_defects,fissure_region,skewness,distribution,defect_specie):
         
+        self.defect_specie = defect_specie
+        
         if distribution == 'uniform':
             self.defects_row(prob_defects,fissure_region,defect_specie)
         if distribution == 'triangle':
