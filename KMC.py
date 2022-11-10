@@ -33,8 +33,10 @@ def KMC(MoS2_lattice):
         while (Pointer_event <= sum_TR):
             s += 1
             Pointer_event += TR[s]
-                    
-        Grid_states = Mo_adatom.processes(Grid_states,s) # Update the Grid with new events
+        
+        MoS2_crystal = Cluster(Grid_states,atomic_specie)
+        
+        Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) # Update the Grid with new events
         
         
     MoS2_lattice.Grid_states = Grid_states # Store the new lattice state

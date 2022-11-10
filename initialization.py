@@ -19,8 +19,8 @@ def initialization():
     """ 
     a=0.639 # nm
     b=0.639 # nm
-    device_size = (50 , 50) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
-    atom_colors=['orange','purple','blue'] # MoS2 -> First is Sulfur, second is Mo and third Vs
+    device_size = (5, 5) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+    atom_colors=['orange','purple','blue', 'black'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
     # Activation energies
     E_mig_armchair = 1 # Armchair direction
@@ -64,13 +64,13 @@ def initialization():
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     pair_atom_defect = (atomic_specie,defect_specie)
     
-    prob_defects = 0.5 # prob of generating defects --> Peak density
+    prob_defects = 0.05 # prob of generating defects --> Peak density
     
 
     crystal_orientation = False
     MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect)
-    #pair_atom_defect=(3,4)
-    #MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[3],pair_atom_defect)
+    pair_atom_defect=(3,4)
+    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[3],pair_atom_defect)
 
     MoS2_lattice.plot_lattice(crystal_orientation)
     
