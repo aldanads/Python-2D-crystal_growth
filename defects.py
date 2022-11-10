@@ -22,13 +22,7 @@ class Defects():
     """
     
     # Check possible events
-    def events_available(self,Grid_states):
-        
-
-        
-        # Kink nucleation
-        
-        # Kink propagation
+    def events_available(self,Grid_states,join_cluster_ij):
         
         """ Adatom migration: Mo migrating to Mo positions
             # Mo left (2) or Mo right (3) allowed_events[0]
@@ -38,9 +32,15 @@ class Defects():
             # Left down - Armchair - allowed_events[4]
             # Right up - Armchair - allowed_events[5]
             # Right down - Armchair - allowed_events[6]
-
+            # Join the lattice - allowed_events[7]
         """
-        allowed_events = np.zeros(7)
+        allowed_events = np.zeros(len(self.Act_E)+1)
+
+        # Kink nucleation
+        
+        # Kink propagation
+        if (self.i,self.j) in join_cluster_ij: allowed_events[7]=1 
+
         self.allowed_events = allowed_events 
         # allowed_events =
         # 0: forbidden
@@ -129,6 +129,8 @@ class Defects():
                     
             if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] == atomic_specie): # Right down
                 self.allowed_events[6] = 1
+                        
+        
         
         
         """
@@ -136,9 +138,9 @@ class Defects():
         """
         
         
-    def TR(self,T,Grid_states):
+    def TR(self,T,Grid_states,join_cluster_ij):
         
-        self.events_available(Grid_states)
+        self.events_available(Grid_states,join_cluster_ij)
         kb = 8.6173324E-5 # Boltzmann constant
         nu0=7E13;  # nu0 (s^-1) bond vibration frequency
         allowed_events = self.allowed_events
@@ -147,6 +149,8 @@ class Defects():
         TR = nu0*np.exp(-np.array(self.Act_E)/(kb*T))
         TR[allowed_events[1:] == 0] = 0
         self.TR = TR
+        
+        return TR
         
         """
         ________________________ PROCESSES __________________________
@@ -168,8 +172,12 @@ class Defects():
         # Left down - Armchair - allowed_events[4]
         # Right up - Armchair - allowed_events[5]
         # Right down - Armchair - allowed_events[6]
+        # Join the lattice - allowed_events[7]
+        if (s == 7): # The defect join the cluster -> Exit the function
+            Grid_states[i,j] = 4 
+            return Grid_states
         
-        if self.allowed_events[0] == 2: # Mo left (2) 
+        elif self.allowed_events[0] == 2: # Mo left (2) 
         
             """
             ---------------------- Migration ----------------------------------
@@ -259,14 +267,20 @@ class Defects():
             
 class Cluster():
         
-    def __init__(self,Grid_states,atomic_specie):
+    def __init__(self,Grid_states):
             
         self.cluster_ij = np.where(Grid_states == 4)
         self.cluster_size = sum(sum(Grid_states == 4)) + sum(sum(Grid_states == 5))
-        self.atomic_specie = atomic_specie
         self.clustering_region(Grid_states)
             
-        
+    """
+    I should improve the efficiency of the clustering_region method --> It looks for the regions at every step of the 
+    kMC algorithm --> It is clear that needs updates because new atoms can join the crystal
+    It should keep the cluster and just update with the new particles that join the crystal --> Update coordinates
+    Fix the definition of inner points
+    
+    It should be easier to incorporate to the crystal defects defects in contact with many crystal particles
+    """
     # Search for the region where the adatom can join the growing crystal
     def clustering_region(self,Grid_states):
             
@@ -275,7 +289,6 @@ class Cluster():
         length_x = len(Grid_states)-1
         length_y = len(Grid_states[0])-1
                     
-        atomic_specie = self.atomic_specie
                     
         # Create a empty tuple (with two lists) for the region where the 
         # joining to the cluster is possible
@@ -295,33 +308,33 @@ class Cluster():
                 """
                 Up and down
                 """
-                if (i>1) and (Grid_states[i-2,j] == atomic_specie): # Down
+                if (i>1) and (Grid_states[i-2,j] == 2): # Down
                     join_cluster_ij.append((i-2,j))    
                     join_sites += 1
                         
-                if (i<length_x-1) and (Grid_states[i+2,j] == atomic_specie): # Up
+                if (i<length_x-1) and (Grid_states[i+2,j] == 2): # Up
                     join_cluster_ij.append((i+2,j))    
                     join_sites += 1
                         
                 """
                 Left up and down
                 """
-                if (j>1) and (i<length_x) and (Grid_states[i+1,j-2] == atomic_specie): # Left up
+                if (j>1) and (i<length_x) and (Grid_states[i+1,j-2] == 2): # Left up
                     join_cluster_ij.append((i+1,j-2))    
                     join_sites += 1
                             
-                if (j>1) and (i>0) and (Grid_states[i-1,j-2] == atomic_specie): # Left down
+                if (j>1) and (i>0) and (Grid_states[i-1,j-2] == 2): # Left down
                     join_cluster_ij.append((i-1,j-2))    
                     join_sites += 1
                         
                 """
                 Right up and down
                 """
-                if (i<length_x) and (j<length_y) and (Grid_states[i+1,j+1] == atomic_specie): # Right up
+                if (i<length_x) and (j<length_y) and (Grid_states[i+1,j+1] == 2): # Right up
                     join_cluster_ij.append((i+1,j+1))    
                     join_sites += 1
                                 
-                if (i>0) and (j<length_y) and (Grid_states[i-1,j+1] == atomic_specie): # Right down
+                if (i>0) and (j<length_y) and (Grid_states[i-1,j+1] == 2): # Right down
                     join_cluster_ij.append((i-1,j+1))    
                     join_sites += 1
                         
@@ -334,40 +347,41 @@ class Cluster():
                 """
                 Up and down
                 """
-                if (i>1) and (Grid_states[i-2,j] == atomic_specie): # Down
+                if (i>1) and (Grid_states[i-2,j] == 2): # Down
                     join_cluster_ij.append((i-2,j))    
                     join_sites += 1
                         
-                if (i<length_x-1) and (Grid_states[i+2,j] == atomic_specie): # Up
+                if (i<length_x-1) and (Grid_states[i+2,j] == 2): # Up
                     join_cluster_ij.append((i+2,j))    
                     join_sites += 1
                     
                 """
                 Left up and down
                 """
-                if (j>0) and (i<length_x) and (Grid_states[i+1,j-1] == atomic_specie): # Left up
+                if (j>0) and (i<length_x) and (Grid_states[i+1,j-1] == 2): # Left up
                     join_cluster_ij.append((i+1,j-1))    
                     join_sites += 1
                         
-                if (j>0) and (i>0) and (Grid_states[i-1,j-1] == atomic_specie): # Left down
+                if (j>0) and (i>0) and (Grid_states[i-1,j-1] == 2): # Left down
                     join_cluster_ij.append((i-1,j-1))    
                     join_sites += 1
                         
                 """
                 Right up and down
                 """
-                if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] == atomic_specie): # Right up
+                if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] == 2): # Right up
                     join_cluster_ij.append((i+1,j+2))    
                     join_sites += 1
                         
-                if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] == atomic_specie): # Right down
+                if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] == 2): # Right down
                     join_cluster_ij.append((i-1,j+2))    
                     join_sites += 1
                     
-            if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal
+            #if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal
             
         # Grid points adjacent to the crystal, so they may join the crystal
         self.join_cluster_ij = set(join_cluster_ij) # Select unique elements from the list
+
         self.Grid_states = Grid_states
                         
 

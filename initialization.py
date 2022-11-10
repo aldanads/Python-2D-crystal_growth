@@ -19,14 +19,15 @@ def initialization():
     """ 
     a=0.639 # nm
     b=0.639 # nm
-    device_size = (5, 5) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+    device_size = (50, 50) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
     atom_colors=['orange','purple','blue', 'black'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
     # Activation energies
     E_mig_armchair = 1 # Armchair direction
     E_mig_zigzag = 1 # Zigzag direction
+    E_join_cluster = 0.2
     
-    Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair]
+    Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_join_cluster]
     
     # Temperature
     T = 300
@@ -64,7 +65,7 @@ def initialization():
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     pair_atom_defect = (atomic_specie,defect_specie)
     
-    prob_defects = 0.05 # prob of generating defects --> Peak density
+    prob_defects = 0.3 # prob of generating defects --> Peak density
     
 
     crystal_orientation = False

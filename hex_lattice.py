@@ -248,7 +248,7 @@ class Hexagonal_lattice():
             while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
                 j += 1
             self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
-            self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie 
+            self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
 
     
             
@@ -256,6 +256,11 @@ class Hexagonal_lattice():
         
         self.n_defects = np.count_nonzero(self.Grid_states == 2)
         self.coord_xy_defects = np.where(self.Grid_states == 2)
+            
+            
+    
+
+
         
         
         
