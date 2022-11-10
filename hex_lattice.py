@@ -25,6 +25,9 @@ class Hexagonal_lattice():
         self.atom3_colors = atom_colors[2]
         self.Act_E = Act_E
         self.T = T
+        
+        self.create_hex_grid()
+        self.pristine_crystal()
 
     
     def create_hex_grid(self):
@@ -108,15 +111,15 @@ class Hexagonal_lattice():
         
         self.Grid_states = Grid_states
         
-    def introduce_defects_j_row(self,j,prob_defects,defect_specie):
+    def introduce_defects_j_row(self,j,prob_defects):
         
         counter=0
 
         # The defects we are introducing in column j
-        prob_defects=np.random.rand(sum(self.Grid_states[:,j] == defect_specie)) < prob_defects
+        prob_defects=np.random.rand(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
             
         for i in np.arange(len(self.xv)):
-            if self.Grid_states[i,j] == defect_specie:
+            if self.Grid_states[i,j] == self.atomic_specie:
                 
                 if prob_defects[counter]:
                     self.Grid_states[i,j] = 2
@@ -124,9 +127,9 @@ class Hexagonal_lattice():
                 counter += 1
 
     # Uniform distribution
-    def defects_row(self,prob_defects,fissure_region,defect_specie):
+    def defects_row(self,prob_defects,fissure_region):
         
-        self.pristine_crystal() # Initialize a pristine 2D MoS2 layer
+        
         # 1 position is sulfur and the other is Molybdenum --> there is len(xv)/2 sulfur in a column
         
         a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
@@ -153,13 +156,11 @@ class Hexagonal_lattice():
         
         for j in np.arange(start_row,finish_row):
             
-            self.introduce_defects_j_row(j,prob_defects,defect_specie)
+            self.introduce_defects_j_row(j,prob_defects)
 
     # Skewed Gaussian distribution:
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.skewnorm.html
-    def defects_skewed_gaussian(self,prob_defects,fissure_region,skewness,defect_specie):
-
-        self.pristine_crystal() # Initialize a pristine 2D MoS2 layer
+    def defects_skewed_gaussian(self,prob_defects,fissure_region,skewness):
 
         a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
         
@@ -188,13 +189,12 @@ class Hexagonal_lattice():
             
             list_prob.append(prob)
 
-            self.introduce_defects_j_row(j,prob_defects,defect_specie)
+            self.introduce_defects_j_row(j,prob_defects)
             
         self.list_prob = list_prob
         
-    def defect_triangle(self,prob_defects,fissure_region,defect_specie):
-            
-        self.pristine_crystal() # Initialize a pristine 2D MoS2 layer
+    def defect_triangle(self,prob_defects,fissure_region):
+                    
         a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
              
         irradiated_row = fissure_region[0] # Middle point of the triangle base
@@ -217,39 +217,46 @@ class Hexagonal_lattice():
             dose=slope*(start_triangle-j)+b;
             list_prob[j] = dose
 
-            self.introduce_defects_j_row(j,prob_defects,defect_specie)
+            self.introduce_defects_j_row(j,prob_defects)
             
         self.list_prob = list_prob
         
-    def defect_distributions(self,prob_defects,fissure_region,skewness,distribution,defect_specie):
+    def defect_distributions(self,prob_defects,fissure_region,skewness,distribution,pair_atom_defect):
         
-        self.defect_specie = defect_specie
+        self.atomic_specie = pair_atom_defect[0]
+        self.defect_specie = pair_atom_defect[1]
         
         if distribution == 'uniform':
-            self.defects_row(prob_defects,fissure_region,defect_specie)
+            self.defects_row(prob_defects,fissure_region)
         if distribution == 'triangle':
-            self.defect_triangle(prob_defects,fissure_region,defect_specie)
+            self.defect_triangle(prob_defects,fissure_region)
         if distribution == 'skewed_gaussian':
-            self.defects_skewed_gaussian(prob_defects,fissure_region,skewness,defect_specie)
+            self.defects_skewed_gaussian(prob_defects,fissure_region,skewness)
+        if distribution == 'test 1: single adatom':
+            self.single_defect()
             
-    def single_adatom(self):
+    def single_defect(self):
 
-        self.pristine_crystal() # Initialize a pristine 2D MoS2 layer
         j = 0
         length_xv = len(self.xv)
         length_yv = len(self.yv[0])
 
-        if self.Grid_states[int(length_xv/2),int(length_yv/2)] == 3:
-            self.Grid_states[int(length_xv)/2,length_yv/2] = 2
+        if self.Grid_states[int(length_xv/2),int(length_yv/2)] == self.atomic_specie:
+            self.Grid_states[int(length_xv/2),int(length_yv/2)] = self.defect_specie
         else:
-            while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != 3:
+            while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
                 j += 1
-            self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = 2 
+            self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
     
             
     def coord_defects(self):
         
         self.n_defects = np.count_nonzero(self.Grid_states == 2)
         self.coord_xy_defects = np.where(self.Grid_states == 2)
+        
+        
+        
+        
+        
             
 

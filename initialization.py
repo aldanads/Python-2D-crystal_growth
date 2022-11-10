@@ -30,6 +30,8 @@ def initialization():
     
     # Temperature
     T = 300
+    # T = 835 Celsius in exp
+    # time for growing: 5 min
     
     """  
     ---------------------------------------------
@@ -44,28 +46,32 @@ def initialization():
     
     # Create MoS2 crystal
     MoS2_lattice = Hexagonal_lattice(a,b,device_size,atom_colors,Act_E,T)
-    MoS2_lattice.create_hex_grid()
     xv=MoS2_lattice.xv
-    yv=MoS2_lattice.yv
     """
     distribution:
         'uniform' --> Uniform rows
         'skewed_gaussian' --> Skewed Gaussian distribution of defects
         'triangle' --> Right triangle distribution of defects
+        'test 1: single adatom' --> Single adatom in the middle of the grid
     """
-    
-    
-    distribution = 'uniform'
-    defect_specie = 3 # Sulfur = 1 // Molibdenum = 3
-    prob_defects = 0.5 # prob of generating defects --> Peak density
-    fissure_region = (round(len(xv[0])/2)+1,4) # [0] middle point and [1] half width (nm)
-    
+    distribution = ['uniform','skewed_gaussian','triangle','test 1: single adatom']
     # skewness parameter --> a=0 is the normal distribution
     skewness = 12 # Skewness of the skewed Gaussian distribution
+    fissure_region = (round(len(xv[0])/2)+1,4) # [0] middle point and [1] half width (nm)
+    # Atomic specie -> Whay kind of atoms are affected by defects
+    atomic_specie = 3 # Sulfur = 1 // Molibdenum = 3
+    # Type of defects in the lattice
+    defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
+    pair_atom_defect = (atomic_specie,defect_specie)
     
+    prob_defects = 0.5 # prob of generating defects --> Peak density
+    
+
     crystal_orientation = False
-    #MoS2_lattice.single_adatom()
-    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution,defect_specie)
+    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect)
+    #pair_atom_defect=(3,4)
+    #MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[3],pair_atom_defect)
+
     MoS2_lattice.plot_lattice(crystal_orientation)
     
     return MoS2_lattice

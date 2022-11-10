@@ -9,5 +9,6 @@ from KMC import*
 
 MoS2_lattice = initialization()
 
-MoS2_lattice, Mo_adatom = KMC(MoS2_lattice)
-
+for i in np.arange(10):
+    MoS2_lattice = KMC(MoS2_lattice)
+    MoS2_lattice.plot_lattice()

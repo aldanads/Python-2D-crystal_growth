@@ -8,12 +8,12 @@ import numpy as np
 
 class Defects():
     
-    def __init__(self,i,j,Act_E,defect_specie):
+    def __init__(self,i,j,Act_E,atomic_specie):
         
         self.i = i
         self.j = j
         self.Act_E = Act_E
-        self.defect_specie = defect_specie
+        self.atomic_specie = atomic_specie
 
     
     """
@@ -58,7 +58,7 @@ class Defects():
         i = self.i
         j = self.j
         
-        defect_specie = self.defect_specie
+        atomic_specie = self.atomic_specie
         
         if ((i>0) and (Grid_states[i-1,j] == 0)) or ((i<length_x) and (Grid_states[i+1,j] == 0)):
         # 0
@@ -69,28 +69,28 @@ class Defects():
             """
             Up and down
             """
-            if (i>1) and Grid_states[i-2,j] == defect_specie: # Down
+            if (i>1) and Grid_states[i-2,j] == atomic_specie: # Down
                self.allowed_events[1] = 1 
                
-            if (i<length_x-1) and (Grid_states[i+2,j] == defect_specie): # Up
+            if (i<length_x-1) and (Grid_states[i+2,j] == atomic_specie): # Up
                 self.allowed_events[2] = 1
                 
             """
             Left up and down
             """
-            if (j>1) and (i<length_x) and (Grid_states[i+1,j-2] == defect_specie): # Left up
+            if (j>1) and (i<length_x) and (Grid_states[i+1,j-2] == atomic_specie): # Left up
                 self.allowed_events[3] = 1
 
-            if (j>1) and (i>0) and (Grid_states[i-1,j-2] == defect_specie): # Left down
+            if (j>1) and (i>0) and (Grid_states[i-1,j-2] == atomic_specie): # Left down
                 self.allowed_events[4] = 1
                 
             """
             Right up and down
             """
-            if (i<length_x) and (j<length_y) and (Grid_states[i+1,j+1] == defect_specie): # Right up
+            if (i<length_x) and (j<length_y) and (Grid_states[i+1,j+1] == atomic_specie): # Right up
                 self.allowed_events[5] = 1
                 
-            if (i>0) and (j<length_y) and (Grid_states[i-1,j+1] == defect_specie): # Right down
+            if (i>0) and (j<length_y) and (Grid_states[i-1,j+1] == atomic_specie): # Right down
                 self.allowed_events[6] = 1
 
                 
@@ -105,28 +105,28 @@ class Defects():
             """
             Up and down
             """
-            if (i>1) and Grid_states[i-2,j] == defect_specie: # Down
+            if (i>1) and Grid_states[i-2,j] == atomic_specie: # Down
                self.allowed_events[1] = 1 
                
-            if (i<length_x-1) and (Grid_states[i+2,j] == defect_specie): # Up
+            if (i<length_x-1) and (Grid_states[i+2,j] == atomic_specie): # Up
                 self.allowed_events[2] = 1
 
             """
             Left up and down
             """
-            if (j>0) and (i<length_x) and (Grid_states[i+1,j-1] == defect_specie): # Left up
+            if (j>0) and (i<length_x) and (Grid_states[i+1,j-1] == atomic_specie): # Left up
                 self.allowed_events[3] = 1
             
-            if (j>0) and (i>0) and (Grid_states[i-1,j-1] == defect_specie): # Left down
+            if (j>0) and (i>0) and (Grid_states[i-1,j-1] == atomic_specie): # Left down
                 self.allowed_events[4] = 1
                 
             """
             Right up and down
             """
-            if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] == defect_specie): # Right up
+            if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] == atomic_specie): # Right up
                 self.allowed_events[5] = 1
                     
-            if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] == defect_specie): # Right down
+            if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] == atomic_specie): # Right down
                 self.allowed_events[6] = 1
         
         
@@ -158,7 +158,7 @@ class Defects():
         i = self.i
         j = self.j
         
-        defect_specie = self.defect_specie
+        atomic_specie = self.atomic_specie
         
         # Down - Zigzag - allowed_events[1]    
         # Up - Zigzag - allowed_events[2]   
@@ -174,35 +174,35 @@ class Defects():
             """
         
             if (s == 1): # Down - Zigzag
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i-2,j] = 2
                 self.i = i-2
                 
             elif (s == 2): # Up - Zigzag
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i+2,j] = 2
                 self.i = i+2
                 
             elif (s == 3): # Left up - Armchair
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i+1,j-2] = 2
                 self.i = i+1
                 self.j = j-2
             
             elif (s == 4): # Left down - Armchair
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i-1,j-2] = 2
                 self.i = i-1
                 self.j = j-2
                 
             elif (s == 5): # Right up - Armchair
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i+1,j+1] = 2
                 self.i = i+1
                 self.j = j+1
                 
             elif (s == 6): # Right down - Armchair
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i-1,j+1] = 2
                 self.i = i-1
                 self.j = j+1
@@ -214,35 +214,35 @@ class Defects():
             """
             
             if (s == 1): # Down - Zigzag
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i-2,j] = 2
                 self.i = i-2
                 
             elif (s == 2): # Up - Zigzag
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i+2,j] = 2
                 self.i = i+2
                 
             elif (s == 3): # Left up - Armchair
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i+1,j-1] = 2
                 self.i = i+1
                 self.j = j-1
             
             elif (s == 4): # Left down - Armchair
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i-1,j-1] = 2
                 self.i = i-1
                 self.j = j-1
             
             elif (s == 5): # Right up - Armchair
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i+1,j+2] = 2
                 self.i = i+1
                 self.j = j+2
             
             elif (s == 6): # Right down - Armchair
-                Grid_states[i,j] = defect_specie
+                Grid_states[i,j] = atomic_specie
                 Grid_states[i-1,j+2] = 2
                 self.i = i-1
                 self.j = j+2
