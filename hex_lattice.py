@@ -101,6 +101,21 @@ class Hexagonal_lattice():
         -------------------- Introducing defects in the crystal ---------------
         """
         
+    def defect_distributions(self,prob_defects,fissure_region,skewness,distribution,pair_atom_defect):
+            
+        self.atomic_specie = pair_atom_defect[0]
+        self.defect_specie = pair_atom_defect[1]
+            
+        if distribution == 'uniform':
+            self.defects_row(prob_defects,fissure_region)
+        if distribution == 'triangle':
+            self.defect_triangle(prob_defects,fissure_region)
+        if distribution == 'skewed_gaussian':
+            self.defects_skewed_gaussian(prob_defects,fissure_region,skewness)
+        if distribution == 'test 1: single adatom':
+            self.single_defect()
+            
+        
     def pristine_crystal(self):
         
         Grid_states=np.zeros((len(self.xv),len(self.xv[0])), dtype=int)
@@ -112,20 +127,6 @@ class Hexagonal_lattice():
         
         self.Grid_states = Grid_states
         
-    def introduce_defects_j_row(self,j,prob_defects):
-        
-        counter=0
-
-        # The defects we are introducing in column j
-        prob_defects=np.random.rand(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
-            
-        for i in np.arange(len(self.xv)):
-            if self.Grid_states[i,j] == self.atomic_specie:
-                
-                if prob_defects[counter]:
-                    self.Grid_states[i,j] = 2
-                
-                counter += 1
 
     # Uniform distribution
     def defects_row(self,prob_defects,fissure_region):
@@ -158,6 +159,35 @@ class Hexagonal_lattice():
         for j in np.arange(start_row,finish_row):
             
             self.introduce_defects_j_row(j,prob_defects)
+        
+    # Triangle distribution of defects
+    def defect_triangle(self,prob_defects,fissure_region):
+                    
+        a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
+             
+        irradiated_row = fissure_region[0] # Middle point of the triangle base
+        # Half of the triangle base
+        width_fissure = fissure_region[1]*2/a # half width of fissure region in columns
+            
+        # The triangle starting point in the grid
+        start_triangle = round(irradiated_row - width_fissure)
+        # The last point of the triangle in the grid
+        finish_triangle = round(irradiated_row + width_fissure)
+            
+        # Slope --> right triangle hypotenuse 
+        slope = prob_defects / (2 * width_fissure)
+        b = prob_defects
+            
+        list_prob = np.zeros(len(self.xv[0]))
+            
+        for j in np.arange(start_triangle,finish_triangle):
+            # Triangle hypotenuse 
+            dose=slope*(start_triangle-j)+b;
+            list_prob[j] = dose
+
+            self.introduce_defects_j_row(j,prob_defects)
+            
+        self.list_prob = list_prob
 
     # Skewed Gaussian distribution:
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.skewnorm.html
@@ -194,47 +224,6 @@ class Hexagonal_lattice():
             
         self.list_prob = list_prob
         
-    def defect_triangle(self,prob_defects,fissure_region):
-                    
-        a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
-             
-        irradiated_row = fissure_region[0] # Middle point of the triangle base
-        # Half of the triangle base
-        width_fissure = fissure_region[1]*2/a # half width of fissure region in columns
-            
-        # The triangle starting point in the grid
-        start_triangle = round(irradiated_row - width_fissure)
-        # The last point of the triangle in the grid
-        finish_triangle = round(irradiated_row + width_fissure)
-            
-        # Slope --> right triangle hypotenuse 
-        slope = prob_defects / (2 * width_fissure)
-        b = prob_defects
-            
-        list_prob = np.zeros(len(self.xv[0]))
-            
-        for j in np.arange(start_triangle,finish_triangle):
-            # Triangle hypotenuse 
-            dose=slope*(start_triangle-j)+b;
-            list_prob[j] = dose
-
-            self.introduce_defects_j_row(j,prob_defects)
-            
-        self.list_prob = list_prob
-        
-    def defect_distributions(self,prob_defects,fissure_region,skewness,distribution,pair_atom_defect):
-        
-        self.atomic_specie = pair_atom_defect[0]
-        self.defect_specie = pair_atom_defect[1]
-        
-        if distribution == 'uniform':
-            self.defects_row(prob_defects,fissure_region)
-        if distribution == 'triangle':
-            self.defect_triangle(prob_defects,fissure_region)
-        if distribution == 'skewed_gaussian':
-            self.defects_skewed_gaussian(prob_defects,fissure_region,skewness)
-        if distribution == 'test 1: single adatom':
-            self.single_defect()
             
     def single_defect(self):
 
@@ -248,14 +237,33 @@ class Hexagonal_lattice():
             while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
                 j += 1
             self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
-            self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
+            #self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
 
     
             
     def coord_defects(self):
         
-        self.n_defects = np.count_nonzero(self.Grid_states == 2)
-        self.coord_xy_defects = np.where(self.Grid_states == 2)
+        n_defects = np.count_nonzero(self.Grid_states == 2)
+        coord_xy_defects = np.where(self.Grid_states == 2)
+        self.n_defects = n_defects
+        self.coord_xy_defects = coord_xy_defects
+        
+        return coord_xy_defects
+        
+    def introduce_defects_j_row(self,j,prob_defects):
+        
+        counter=0
+
+        # The defects we are introducing in column j
+        prob_defects=np.random.rand(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
+            
+        for i in np.arange(len(self.xv)):
+            if self.Grid_states[i,j] == self.atomic_specie:
+                
+                if prob_defects[counter]:
+                    self.Grid_states[i,j] = 2
+                
+                counter += 1
             
             
     

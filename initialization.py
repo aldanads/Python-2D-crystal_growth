@@ -25,7 +25,7 @@ def initialization():
     # Activation energies
     E_mig_armchair = 1 # Armchair direction
     E_mig_zigzag = 1 # Zigzag direction
-    E_join_cluster = 0.2
+    E_join_cluster = 0.9
     
     Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_join_cluster]
     
