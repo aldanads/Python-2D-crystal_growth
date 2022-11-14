@@ -269,8 +269,12 @@ class Cluster():
         
     def __init__(self,Grid_states):
             
-        self.cluster_ij = np.where(Grid_states == 4)
+        cluster_ij = np.where(Grid_states == 4)
+        cluster_ij = [(cluster_ij[0][i],cluster_ij[1][i]) for i in np.arange(len(cluster_ij[0]))]
+
+        self.cluster_ij = cluster_ij # List of tuples
         self.cluster_size = sum(sum(Grid_states == 4)) + sum(sum(Grid_states == 5))
+        
         self.clustering_region(Grid_states)
             
     """
@@ -290,14 +294,14 @@ class Cluster():
         length_y = len(Grid_states[0])-1
                     
                     
-        # Create a empty tuple (with two lists) for the region where the 
-        # joining to the cluster is possible
+        # Create a empty list --> Add tuples with coordinates where defects can 
+        # joining to the cluster
         join_cluster_ij = []   
         
         # For loop over the all the particles in the crystal edge
-        for k in np.arange(len(self.cluster_ij[0])):    
-            i = self.cluster_ij[0][k]
-            j = self.cluster_ij[1][k]
+        for k in np.arange(len(self.cluster_ij)):  
+            i = self.cluster_ij[k][0]
+            j = self.cluster_ij[k][1]
             join_sites = 0 # Number of free sites around a specific cluster point
                 
             """
@@ -378,7 +382,7 @@ class Cluster():
                     join_sites += 1
                     
             #if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal
-            
+            print (join_sites)
         # Grid points adjacent to the crystal, so they may join the crystal
         self.join_cluster_ij = set(join_cluster_ij) # Select unique elements from the list
 

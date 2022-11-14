@@ -8,6 +8,8 @@ Created on Wed Sep 14 20:15:19 2022
 from hex_lattice import*
 import numpy as np
 import matplotlib.pyplot as plt
+from defects import Cluster
+
 
 def initialization():
 
@@ -65,14 +67,16 @@ def initialization():
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     pair_atom_defect = (atomic_specie,defect_specie)
     
-    prob_defects = 0.3 # prob of generating defects --> Peak density
+    prob_defects = 0.2 # prob of generating defects --> Peak density
     
 
     crystal_orientation = False
     MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect)
     pair_atom_defect=(3,4)
     MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[3],pair_atom_defect)
-
+    
+    MoS2_crystal = Cluster(MoS2_lattice.Grid_states) # Crystal seed
+    
     MoS2_lattice.plot_lattice(crystal_orientation)
     
-    return MoS2_lattice
+    return MoS2_lattice,MoS2_crystal

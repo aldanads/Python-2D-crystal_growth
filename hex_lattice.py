@@ -246,8 +246,9 @@ class Hexagonal_lattice():
         n_defects = np.count_nonzero(self.Grid_states == 2)
         coord_xy_defects = np.where(self.Grid_states == 2)
         self.n_defects = n_defects
+        # Transform the coordinate in a list of tuples --> Easier to compare with other tuples
+        coord_xy_defects = [(coord_xy_defects[0][i],coord_xy_defects[1][i]) for i in np.arange(len(coord_xy_defects[0]))]
         self.coord_xy_defects = coord_xy_defects
-        
         return coord_xy_defects
         
     def introduce_defects_j_row(self,j,prob_defects):

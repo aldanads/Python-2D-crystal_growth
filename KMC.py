@@ -7,19 +7,21 @@ Created on Mon Nov  7 17:07:32 2022
 import numpy as np
 from defects import*
 
-def KMC(MoS2_lattice):
+def KMC(MoS2_lattice, MoS2_crystal):
     
     Grid_states = MoS2_lattice.Grid_states # 
     T = MoS2_lattice.T # Crystal temperature 
     coord_Mo = MoS2_lattice.coord_defects() # Search the coordinates of every defects - Update at every time step
 
     
-    for i in np.arange(len(coord_Mo[0])):
+    for i in np.arange(len(coord_Mo)):
 
     
-        Mo_adatom = Defects(coord_Mo[0][i],coord_Mo[1][i],MoS2_lattice.Act_E,MoS2_lattice.atomic_specie)
-        MoS2_crystal = Cluster(Grid_states)
-
+        Mo_adatom = Defects(coord_Mo[i][0],coord_Mo[i][1],MoS2_lattice.Act_E,MoS2_lattice.atomic_specie)
+        #"""
+        MoS2_crystal = Cluster(Grid_states) #--> This should be an update
+        #"""
+        
         TR = Mo_adatom.TR(T,Grid_states,MoS2_crystal.join_cluster_ij) # Calculate the transition rates
         
         # Select event
