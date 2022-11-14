@@ -275,7 +275,11 @@ class Cluster():
         self.cluster_ij = cluster_ij # List of tuples
         self.cluster_size = sum(sum(Grid_states == 4)) + sum(sum(Grid_states == 5))
         
-        self.clustering_region(Grid_states)
+        # Create a empty list --> Add tuples with coordinates where defects can 
+        # joining to the cluster
+        self.join_cluster_ij = []   
+        
+        self.clustering_region(Grid_states,cluster_ij)
             
     """
     I should improve the efficiency of the clustering_region method --> It looks for the regions at every step of the 
@@ -286,7 +290,7 @@ class Cluster():
     It should be easier to incorporate to the crystal defects defects in contact with many crystal particles
     """
     # Search for the region where the adatom can join the growing crystal
-    def clustering_region(self,Grid_states):
+    def clustering_region(self,Grid_states,cluster_ij):
             
 
             
@@ -294,14 +298,13 @@ class Cluster():
         length_y = len(Grid_states[0])-1
                     
                     
-        # Create a empty list --> Add tuples with coordinates where defects can 
-        # joining to the cluster
-        join_cluster_ij = []   
+        join_cluster_ij = self.join_cluster_ij # Need to be a list to append elements
         
         # For loop over the all the particles in the crystal edge
-        for k in np.arange(len(self.cluster_ij)):  
-            i = self.cluster_ij[k][0]
-            j = self.cluster_ij[k][1]
+        for k in np.arange(len(cluster_ij)): 
+
+            i = cluster_ij[k][0]
+            j = cluster_ij[k][1]
             join_sites = 0 # Number of free sites around a specific cluster point
                 
             """
@@ -312,33 +315,35 @@ class Cluster():
                 """
                 Up and down
                 """
-                if (i>1) and (Grid_states[i-2,j] == 2): # Down
+                # Grid_states < 4 means there is Mo (3) or a Mo adatom (2)
+                # We don't check S (1) or empty spaces (0)
+                if (i>1) and (Grid_states[i-2,j] < 4): # Down
                     join_cluster_ij.append((i-2,j))    
                     join_sites += 1
                         
-                if (i<length_x-1) and (Grid_states[i+2,j] == 2): # Up
+                if (i<length_x-1) and (Grid_states[i+2,j] < 4): # Up
                     join_cluster_ij.append((i+2,j))    
                     join_sites += 1
                         
                 """
                 Left up and down
                 """
-                if (j>1) and (i<length_x) and (Grid_states[i+1,j-2] == 2): # Left up
+                if (j>1) and (i<length_x) and (Grid_states[i+1,j-2] < 4): # Left up
                     join_cluster_ij.append((i+1,j-2))    
                     join_sites += 1
                             
-                if (j>1) and (i>0) and (Grid_states[i-1,j-2] == 2): # Left down
+                if (j>1) and (i>0) and (Grid_states[i-1,j-2] < 4): # Left down
                     join_cluster_ij.append((i-1,j-2))    
                     join_sites += 1
                         
                 """
                 Right up and down
                 """
-                if (i<length_x) and (j<length_y) and (Grid_states[i+1,j+1] == 2): # Right up
+                if (i<length_x) and (j<length_y) and (Grid_states[i+1,j+1] < 4): # Right up
                     join_cluster_ij.append((i+1,j+1))    
                     join_sites += 1
                                 
-                if (i>0) and (j<length_y) and (Grid_states[i-1,j+1] == 2): # Right down
+                if (i>0) and (j<length_y) and (Grid_states[i-1,j+1] < 4): # Right down
                     join_cluster_ij.append((i-1,j+1))    
                     join_sites += 1
                         
@@ -351,43 +356,50 @@ class Cluster():
                 """
                 Up and down
                 """
-                if (i>1) and (Grid_states[i-2,j] == 2): # Down
+                if (i>1) and (Grid_states[i-2,j] < 4): # Down
                     join_cluster_ij.append((i-2,j))    
                     join_sites += 1
                         
-                if (i<length_x-1) and (Grid_states[i+2,j] == 2): # Up
+                if (i<length_x-1) and (Grid_states[i+2,j] < 4): # Up
                     join_cluster_ij.append((i+2,j))    
                     join_sites += 1
                     
                 """
                 Left up and down
                 """
-                if (j>0) and (i<length_x) and (Grid_states[i+1,j-1] == 2): # Left up
+                if (j>0) and (i<length_x) and (Grid_states[i+1,j-1] < 4): # Left up
                     join_cluster_ij.append((i+1,j-1))    
                     join_sites += 1
                         
-                if (j>0) and (i>0) and (Grid_states[i-1,j-1] == 2): # Left down
+                if (j>0) and (i>0) and (Grid_states[i-1,j-1] < 4): # Left down
                     join_cluster_ij.append((i-1,j-1))    
                     join_sites += 1
                         
                 """
                 Right up and down
                 """
-                if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] == 2): # Right up
+                if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] < 4): # Right up
                     join_cluster_ij.append((i+1,j+2))    
                     join_sites += 1
                         
-                if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] == 2): # Right down
+                if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] < 4): # Right down
                     join_cluster_ij.append((i-1,j+2))    
                     join_sites += 1
                     
-            #if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal
-            print (join_sites)
+        #
+        if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal  
         # Grid points adjacent to the crystal, so they may join the crystal
-        self.join_cluster_ij = set(join_cluster_ij) # Select unique elements from the list
-
+        # Select unique elements from the list, sort them and transform into a list
+        self.join_cluster_ij = list(sorted(set(join_cluster_ij))) 
         self.Grid_states = Grid_states
                         
+    def crystal_growth(self,Grid_states,new_defect_ij):
+        
+        self.cluster_ij.append(new_defect_ij) # New defect incorporate to the crystal
+        
+        self.clustering_region(Grid_states,[new_defect_ij]) # Check new joining sites
+        join_cluster_ij = self.join_cluster_ij   
 
-                  
- 
+        # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 
+        self.join_cluster_ij = [x for x in self.cluster_ij+join_cluster_ij if x not in self.cluster_ij]
+        

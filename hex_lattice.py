@@ -75,7 +75,7 @@ class Hexagonal_lattice():
         if (type(self.Grid_states) == np.ndarray):
             coord_xy_Vs = np.where(self.Grid_states == 2)
             plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom_colors[2],s=5)
-            coord_xy_Vs = np.where(self.Grid_states == 4)
+            coord_xy_Vs = np.where(self.Grid_states >= 4)
             plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom_colors[3],s=5)
 
         if (crystal_orientation == True): # Crystal orientation

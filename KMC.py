@@ -19,7 +19,6 @@ def KMC(MoS2_lattice, MoS2_crystal):
     
         Mo_adatom = Defects(coord_Mo[i][0],coord_Mo[i][1],MoS2_lattice.Act_E,MoS2_lattice.atomic_specie)
         #"""
-        MoS2_crystal = Cluster(Grid_states) #--> This should be an update
         #"""
         
         TR = Mo_adatom.TR(T,Grid_states,MoS2_crystal.join_cluster_ij) # Calculate the transition rates
@@ -36,6 +35,9 @@ def KMC(MoS2_lattice, MoS2_crystal):
         
         
         Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) # Update the Grid with new events
+        if (s+1) == 7:
+            #print(s)
+            MoS2_crystal.crystal_growth(Grid_states,(coord_Mo[i][0],coord_Mo[i][1])) #--> This should be an update
 
     MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
 

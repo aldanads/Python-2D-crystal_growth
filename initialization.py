@@ -67,7 +67,7 @@ def initialization():
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     pair_atom_defect = (atomic_specie,defect_specie)
     
-    prob_defects = 0.2 # prob of generating defects --> Peak density
+    prob_defects = 0.25 # prob of generating defects --> Peak density
     
 
     crystal_orientation = False
