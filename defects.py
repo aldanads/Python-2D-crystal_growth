@@ -9,12 +9,15 @@ import numpy as np
 class Defects():
     
     
-    def __init__(self,i,j,Act_E,atomic_specie):
+    def __init__(self,i,j,Act_E,atomic_specie,T,Grid_states,join_cluster_ij):
         
         self.i = i
         self.j = j
         self.Act_E = Act_E
         self.atomic_specie = atomic_specie
+        
+        # Calculate the transition rates
+        self.TR(T,Grid_states,join_cluster_ij)
 
     
     """
@@ -34,19 +37,20 @@ class Defects():
             # Right down - Armchair - allowed_events[6]
             # Join the lattice - allowed_events[7]
         """
+
         allowed_events = np.zeros(len(self.Act_E)+1)
 
-        # Kink nucleation
-        
-        # Kink propagation
-        if (self.i,self.j) in join_cluster_ij: allowed_events[7]=1 
+
 
         self.allowed_events = allowed_events 
-        # allowed_events =
-        # 0: forbidden
-        # 1: allowed
+        # allowed_events[0] =
         # 2: left Mo
         # 3: right Mo
+        # allowed_events[1:end] =
+        # 0: forbidden
+        # 1: allowed
+        
+        self.nucleation_available(join_cluster_ij,Grid_states) # Nucleation/propagation
         
         self.mig_available(Grid_states) # Migration
         
@@ -130,7 +134,29 @@ class Defects():
             if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] == atomic_specie): # Right down
                 self.allowed_events[6] = 1
                         
+    def nucleation_available(self,join_cluster_ij,Grid_states):
         
+        i = self.i
+        j = self.j
+        length_x = len(Grid_states)-1
+        length_y = len(Grid_states[0])-1
+
+ 
+        # Defect in (i,j) is in contact with the cluster
+        if (i,j) in join_cluster_ij: 
+            
+            # Kink nucleation --> Armchair
+            # Search in a square 3x4 around (i,j) --> Remember that init:final:steps exclude final
+            if (i>0 and i < length_x and j > 1 and j < length_y-2) and (Grid_states[i-1:i+2:1,j-2:j+3:1] == 4).any():
+                self.allowed_events[7] = 1
+            # Kink propagation --> Zigzag
+            if ((i>1) and Grid_states[i-2,j]) == 4 or (i<length_x-1) and (Grid_states[i+2,j] == 4):
+                self.allowed_events[8] = 1 
+                
+           
+
+
+
         
         
         """
@@ -173,7 +199,7 @@ class Defects():
         # Right up - Armchair - allowed_events[5]
         # Right down - Armchair - allowed_events[6]
         # Join the lattice - allowed_events[7]
-        if (s == 7): # The defect join the cluster -> Exit the function
+        if (s == 7) or (s == 8): # The defect join the cluster -> Exit the function
             Grid_states[i,j] = 4 
             return Grid_states
         
@@ -281,14 +307,7 @@ class Cluster():
         
         self.clustering_region(Grid_states,cluster_ij)
             
-    """
-    I should improve the efficiency of the clustering_region method --> It looks for the regions at every step of the 
-    kMC algorithm --> It is clear that needs updates because new atoms can join the crystal
-    It should keep the cluster and just update with the new particles that join the crystal --> Update coordinates
-    Fix the definition of inner points
-    
-    It should be easier to incorporate to the crystal defects defects in contact with many crystal particles
-    """
+        
     # Search for the region where the adatom can join the growing crystal
     def clustering_region(self,Grid_states,cluster_ij):
             
@@ -402,4 +421,7 @@ class Cluster():
 
         # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 
         self.join_cluster_ij = [x for x in self.cluster_ij+join_cluster_ij if x not in self.cluster_ij]
+        
+        # We update the Grid_states with inner points of the cluster (Grid_states = 5)
+        return self.Grid_states
         

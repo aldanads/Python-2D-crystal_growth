@@ -7,7 +7,7 @@ Created on Mon Nov  7 17:07:32 2022
 import numpy as np
 from defects import*
 
-def KMC(MoS2_lattice, MoS2_crystal):
+def KMC(MoS2_lattice, MoS2_crystal,pair_atom_defect):
     
     Grid_states = MoS2_lattice.Grid_states # 
     T = MoS2_lattice.T # Crystal temperature 
@@ -17,13 +17,12 @@ def KMC(MoS2_lattice, MoS2_crystal):
     for i in np.arange(len(coord_Mo)):
 
     
-        Mo_adatom = Defects(coord_Mo[i][0],coord_Mo[i][1],MoS2_lattice.Act_E,MoS2_lattice.atomic_specie)
-        #"""
-        #"""
+        Mo_adatom = Defects(coord_Mo[i][0],coord_Mo[i][1],MoS2_lattice.Act_E,pair_atom_defect[0],T,Grid_states,MoS2_crystal.join_cluster_ij)
+        TR = Mo_adatom.TR # Transition rates
         
-        TR = Mo_adatom.TR(T,Grid_states,MoS2_crystal.join_cluster_ij) # Calculate the transition rates
-        
-        # Select event
+        """
+        ------------- Select event with kinetic Monte Carlo technique ------
+        """
         sum_TR = sum(TR)*np.random.rand()
         if sum_TR == 0: continue
         Pointer_event = TR[0]
@@ -32,14 +31,18 @@ def KMC(MoS2_lattice, MoS2_crystal):
         while (Pointer_event <= sum_TR):
             s += 1
             Pointer_event += TR[s]
+        """
+        --------------------------------------------------------------------
+        """
+        
+        # Update the Grid with the chosen events
+        Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) 
         
         
-        Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) # Update the Grid with new events
-        if (s+1) == 7:
-            #print(s)
-            MoS2_crystal.crystal_growth(Grid_states,(coord_Mo[i][0],coord_Mo[i][1])) #--> This should be an update
+        if (s+1) >= 7: # Update the crystal -> New adatom joined
+            Grid_states = MoS2_crystal.crystal_growth(Grid_states,(coord_Mo[i][0],coord_Mo[i][1]))
 
     MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
 
-    return MoS2_lattice,MoS2_crystal
+    return MoS2_lattice,MoS2_crystal,Mo_adatom
 

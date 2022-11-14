@@ -27,9 +27,11 @@ def initialization():
     # Activation energies
     E_mig_armchair = 1 # Armchair direction
     E_mig_zigzag = 1 # Zigzag direction
-    E_join_cluster = 0.9
+    E_nucleation = 1.025 # Kink nucleation --> Growing in armchair direction
+    E_propagation = 0.85 # Kink propagation --> Growing in zigzag direction
+
     
-    Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_join_cluster]
+    Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_nucleation,E_propagation]
     
     # Temperature
     T = 300
@@ -60,23 +62,24 @@ def initialization():
     distribution = ['uniform','skewed_gaussian','triangle','test 1: single adatom']
     # skewness parameter --> a=0 is the normal distribution
     skewness = 12 # Skewness of the skewed Gaussian distribution
-    fissure_region = (round(len(xv[0])/2)+1,4) # [0] middle point and [1] half width (nm)
+    fissure_region = (round(len(xv[0])/2)+8,6) # [0] middle point and [1] half width (nm)
     # Atomic specie -> Whay kind of atoms are affected by defects
     atomic_specie = 3 # Sulfur = 1 // Molibdenum = 3
     # Type of defects in the lattice
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
-    pair_atom_defect = (atomic_specie,defect_specie)
     
     prob_defects = 0.25 # prob of generating defects --> Peak density
     
 
     crystal_orientation = False
-    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect)
     pair_atom_defect=(3,4)
     MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[3],pair_atom_defect)
+    pair_atom_defect = (atomic_specie,defect_specie)
+    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect)
+
     
     MoS2_crystal = Cluster(MoS2_lattice.Grid_states) # Crystal seed
     
-    MoS2_lattice.plot_lattice(crystal_orientation)
+    MoS2_lattice.plot_lattice(crystal_orientation) # Initial state of the grid
     
-    return MoS2_lattice,MoS2_crystal
+    return MoS2_lattice,MoS2_crystal,pair_atom_defect
