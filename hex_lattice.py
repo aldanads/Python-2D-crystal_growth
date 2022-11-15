@@ -23,6 +23,7 @@ class Hexagonal_lattice():
         self.atom_colors = atom_colors
         self.Act_E = Act_E
         self.T = T
+        self.time = [0]
         
         self.create_hex_grid()
         self.pristine_crystal()
@@ -114,6 +115,8 @@ class Hexagonal_lattice():
             self.defects_skewed_gaussian(prob_defects,fissure_region,skewness)
         if distribution == 'test 1: single adatom':
             self.single_defect()
+        if distribution == 'Crystal seed':
+            self.crystal_seed()
             
         
     def pristine_crystal(self):
@@ -239,7 +242,23 @@ class Hexagonal_lattice():
             self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
             #self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
 
-    
+    def crystal_seed(self):
+        j = 0
+        length_xv = len(self.xv)
+        length_yv = len(self.yv[0])
+        
+        if self.Grid_states[int(length_xv/2),int(length_yv/2)] == self.atomic_specie:
+            #self.Grid_states[int(length_xv/2),int(length_yv/2)] = self.defect_specie
+            self.introduce_defects_j_row(int(length_yv/2),1)
+
+        else:
+            while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
+                j += 1
+                
+            self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
+            #self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
+            
+        
             
     def coord_defects(self):
         
@@ -249,22 +268,29 @@ class Hexagonal_lattice():
         # Transform the coordinate in a list of tuples --> Easier to compare with other tuples
         coord_xy_defects = [(coord_xy_defects[0][i],coord_xy_defects[1][i]) for i in np.arange(len(coord_xy_defects[0]))]
         self.coord_xy_defects = coord_xy_defects
+        
         return coord_xy_defects
         
-    def introduce_defects_j_row(self,j,prob_defects):
+    def introduce_defects_j_row(self,j,prob_defects, Lx=1):
         
         counter=0
-
+        x_length = len(self.xv)
+        #init_x = x_length/2*
         # The defects we are introducing in column j
         prob_defects=np.random.rand(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
             
-        for i in np.arange(len(self.xv)):
+        for i in np.arange(x_length):
             if self.Grid_states[i,j] == self.atomic_specie:
                 
                 if prob_defects[counter]:
-                    self.Grid_states[i,j] = 2
+                    self.Grid_states[i,j] = self.defect_specie
                 
                 counter += 1
+   
+    def add_time(self,t):
+        
+        self.time.append(self.time[len(self.time)-1] + t)
+        
             
             
     

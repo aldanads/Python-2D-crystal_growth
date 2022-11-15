@@ -9,9 +9,15 @@ from hex_lattice import*
 import numpy as np
 import matplotlib.pyplot as plt
 from defects import Cluster
+import random
+from datetime import datetime
+
 
 
 def initialization():
+
+    # Random seed as time
+    random.seed(datetime.now())
 
     plt.rcParams["figure.dpi"] = 300 # Default value of dpi = 300
     
@@ -25,16 +31,15 @@ def initialization():
     atom_colors=['orange','purple','blue', 'black'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
     # Activation energies
-    E_mig_armchair = 1 # Armchair direction
-    E_mig_zigzag = 1 # Zigzag direction
-    E_nucleation = 1.025 # Kink nucleation --> Growing in armchair direction
-    E_propagation = 0.85 # Kink propagation --> Growing in zigzag direction
-
-    
-    Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_nucleation,E_propagation]
+    E_mig_armchair = 1.34 # Armchair direction
+    E_mig_zigzag = 1.34 # Zigzag direction
+    E_nucleation = 1.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
+    E_propagation = 1.4 # Kink propagation (1.4 eV) --> Growing in zigzag direction
+    E_desorption = 2
+    Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_nucleation,E_propagation,E_desorption]
     
     # Temperature
-    T = 300
+    T = 1273
     # T = 835 Celsius in exp
     # time for growing: 5 min
     
@@ -59,27 +64,28 @@ def initialization():
         'triangle' --> Right triangle distribution of defects
         'test 1: single adatom' --> Single adatom in the middle of the grid
     """
-    distribution = ['uniform','skewed_gaussian','triangle','test 1: single adatom']
+    distribution = ['uniform','skewed_gaussian','triangle','test 1: single adatom','Crystal seed']
     # skewness parameter --> a=0 is the normal distribution
     skewness = 12 # Skewness of the skewed Gaussian distribution
-    fissure_region = (round(len(xv[0])/2)+8,6) # [0] middle point and [1] half width (nm)
+    fissure_region = (round(len(xv[0])/2)+2,50) # [0] middle point and [1] half width (nm)
     # Atomic specie -> Whay kind of atoms are affected by defects
     atomic_specie = 3 # Sulfur = 1 // Molibdenum = 3
     # Type of defects in the lattice
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     
-    prob_defects = 0.25 # prob of generating defects --> Peak density
+    prob_defects = 0.1
     
-
-    crystal_orientation = False
-    pair_atom_defect=(3,4)
-    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[3],pair_atom_defect)
+    crystal_orientation = True
+    #pair_atom_defect=(3,4)
+    #MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[3],pair_atom_defect)
     pair_atom_defect = (atomic_specie,defect_specie)
     MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect)
+    
+    distribution_parameters = [distribution[0],skewness,fissure_region,pair_atom_defect,prob_defects]
 
     
     MoS2_crystal = Cluster(MoS2_lattice.Grid_states) # Crystal seed
     
     MoS2_lattice.plot_lattice(crystal_orientation) # Initial state of the grid
     
-    return MoS2_lattice,MoS2_crystal,pair_atom_defect
+    return MoS2_lattice,MoS2_crystal,distribution_parameters

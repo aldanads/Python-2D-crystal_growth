@@ -9,12 +9,13 @@ import numpy as np
 class Defects():
     
     
-    def __init__(self,i,j,Act_E,atomic_specie,T,Grid_states,join_cluster_ij):
+    def __init__(self,i,j,Act_E,atomic_specie,T,Grid_states,join_cluster_ij,defect_specie):
         
         self.i = i
         self.j = j
         self.Act_E = Act_E
         self.atomic_specie = atomic_specie
+        self.defect_specie = defect_specie
         
         # Calculate the transition rates
         self.TR(T,Grid_states,join_cluster_ij)
@@ -35,24 +36,38 @@ class Defects():
             # Left down - Armchair - allowed_events[4]
             # Right up - Armchair - allowed_events[5]
             # Right down - Armchair - allowed_events[6]
-            # Join the lattice - allowed_events[7]
+            # Nucleation - allowed_events[7]
+            # Propagation - allowed_events[8]
+            # Desorption - allowed_events[9]
         """
 
         allowed_events = np.zeros(len(self.Act_E)+1)
+        print(self.defect_specie)
 
-
-
-        self.allowed_events = allowed_events 
-        # allowed_events[0] =
-        # 2: left Mo
-        # 3: right Mo
-        # allowed_events[1:end] =
-        # 0: forbidden
-        # 1: allowed
-        
-        self.nucleation_available(join_cluster_ij,Grid_states) # Nucleation/propagation
-        
-        self.mig_available(Grid_states) # Migration
+        # Adatoms --> Migrate, nucleate or desorpt
+        if self.defect_specie == 2: 
+    
+            self.allowed_events = allowed_events 
+            # allowed_events[0] =
+            # 2: left Mo
+            # 3: right Mo
+            # allowed_events[1:end] =
+            # 0: forbidden
+            # 1: allowed
+            
+            self.nucleation_available(join_cluster_ij,Grid_states) # Nucleation/propagation
+            
+            self.mig_available(Grid_states) # Migration
+            
+            self.allowed_events[9] = 1
+            
+        # Atoms at the edge of the crystal --> They can migrate through the edge
+        if self.defect_specie == 4:
+            
+            self.allowed_events = allowed_events 
+            self.migration_edge(join_cluster_ij)
+            
+            
         
         # Function: Check possible migration routes
     def mig_available(self,Grid_states):
@@ -153,9 +168,10 @@ class Defects():
             if ((i>1) and Grid_states[i-2,j]) == 4 or (i<length_x-1) and (Grid_states[i+2,j] == 4):
                 self.allowed_events[8] = 1 
                 
-           
+    def migration_edge(self,join_cluster_ij):
 
-
+        i = self.i
+        j = self.j
 
         
         
@@ -169,6 +185,7 @@ class Defects():
         self.events_available(Grid_states,join_cluster_ij)
         kb = 8.6173324E-5 # Boltzmann constant
         nu0=7E13;  # nu0 (s^-1) bond vibration frequency
+        #nu0 = 1E12 #  Shuai, Chen, Gao Junfeng, Bharathi M. Srinivasan, and Zhang Yong-Wei. "A kinetic Monte Carlo study for mono-and bi-layer growth of MoS2 during chemical vapor deposition." Acta Physico-Chimica Sinica 35, no. 10 (2019): 1119-1127.
         allowed_events = self.allowed_events
         TR = np.zeros(len(allowed_events)-1)
             
@@ -198,9 +215,15 @@ class Defects():
         # Left down - Armchair - allowed_events[4]
         # Right up - Armchair - allowed_events[5]
         # Right down - Armchair - allowed_events[6]
-        # Join the lattice - allowed_events[7]
+        # Kink nucleation - allowed_events[7]
+        # Kink propagation - allowed_events[8]
+        # Desorption - allowed_events[9]
         if (s == 7) or (s == 8): # The defect join the cluster -> Exit the function
             Grid_states[i,j] = 4 
+            return Grid_states
+        
+        if (s == 9):
+            Grid_states[i,j] = 3
             return Grid_states
         
         elif self.allowed_events[0] == 2: # Mo left (2) 
@@ -405,8 +428,8 @@ class Cluster():
                     join_cluster_ij.append((i-1,j+2))    
                     join_sites += 1
                     
-        #
-        if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal  
+        
+            if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal  
         # Grid points adjacent to the crystal, so they may join the crystal
         # Select unique elements from the list, sort them and transform into a list
         self.join_cluster_ij = list(sorted(set(join_cluster_ij))) 
