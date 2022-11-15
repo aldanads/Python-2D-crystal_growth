@@ -13,5 +13,5 @@ prob = np.zeros(len(MoS2_lattice.Act_E)+1)
 for i in np.arange(1000):
     MoS2_lattice, MoS2_crystal,Mo_adatom,prob = KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob)
     
-    if i%2:
+    if i%50:
         MoS2_lattice.plot_lattice()

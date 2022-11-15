@@ -68,14 +68,21 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
         """
         --------------------------------------------------------------------
         """
+
+                
         if np.random.rand() < event_prob:
             # Update the Grid with the chosen events
             Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) 
             prob[s+1] += 1
             prob[0] += 1
-            if (s+1) >= 7: # Update the crystal -> New adatom joined
-                Grid_states = MoS2_crystal.crystal_growth(Grid_states,(coord_Mo[i][0],coord_Mo[i][1]))
 
+            if (s+1 >= 7): # Update the crystal -> New adatom joined
+                Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),s,(Mo_adatom.i,Mo_adatom.j))
+
+                
+        #MoS2_lattice.plot_lattice()
+        
+        
     MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
     MoS2_lattice.add_time(tmax)
     #print(prob/prob[0])

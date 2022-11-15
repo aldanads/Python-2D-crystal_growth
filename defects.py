@@ -42,7 +42,6 @@ class Defects():
         """
 
         allowed_events = np.zeros(len(self.Act_E)+1)
-        print(self.defect_specie)
 
         # Adatoms --> Migrate, nucleate or desorpt
         if self.defect_specie == 2: 
@@ -65,7 +64,7 @@ class Defects():
         if self.defect_specie == 4:
             
             self.allowed_events = allowed_events 
-            self.migration_edge(join_cluster_ij)
+            self.migration_edge(join_cluster_ij,Grid_states)
             
             
         
@@ -116,7 +115,6 @@ class Defects():
                 
         
         if ((i>0) and (Grid_states[i-1,j] == 1)) or ((i<length_x) and (Grid_states[i+1,j] == 1)):
-
         # S
         # 3: Mo (Grid_states) Right Mo --------------------------------------------
         # S
@@ -156,6 +154,7 @@ class Defects():
         length_x = len(Grid_states)-1
         length_y = len(Grid_states[0])-1
 
+        join_cluster_ij = list(set(join_cluster_ij))
  
         # Defect in (i,j) is in contact with the cluster
         if (i,j) in join_cluster_ij: 
@@ -168,11 +167,94 @@ class Defects():
             if ((i>1) and Grid_states[i-2,j]) == 4 or (i<length_x-1) and (Grid_states[i+2,j] == 4):
                 self.allowed_events[8] = 1 
                 
-    def migration_edge(self,join_cluster_ij):
+    def migration_edge(self,join_cluster_ij,Grid_states):
 
         i = self.i
         j = self.j
+        
+        # If the atom is surrounded by more than 2 other atoms, it is immobile
+        if sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4)) > 4: return
 
+        
+        length_x = len(Grid_states)-1
+        length_y = len(Grid_states[0])-1
+        atomic_specie = self.atomic_specie
+
+    
+        # We select the position supported by at least three element of the crystal
+        # That is, the defect in the edge can't jump outside the crystal during the migration process
+        # Jump outside the crystal is the detach process
+        join_cluster_ij = [x for x in join_cluster_ij if join_cluster_ij.count(x) > 2]
+        
+        
+        if ((i>0) and (Grid_states[i-1,j] == 0)) or ((i<length_x) and (Grid_states[i+1,j] == 0)):
+        # 0
+        # 2: Mo (Grid_states) Left Mo --------------------------------------------
+        # 0
+                
+            self.allowed_events[0] = 2 # Left Mo
+            """
+            Up and down
+            """
+            if (i>1) and ((i-2,j) in join_cluster_ij and Grid_states[i-2,j] == atomic_specie): # Down
+               self.allowed_events[10] = 1 
+               
+            if (i<length_x-1) and ((i+2,j) in join_cluster_ij and Grid_states[i+2,j] == atomic_specie): # Up
+                self.allowed_events[11] = 1
+                
+            """
+            Left up and down
+            """
+            if (j>1) and (i<length_x) and ((i+1,j-2) in join_cluster_ij and Grid_states[i+1,j-2] == atomic_specie): # Left up
+                self.allowed_events[12] = 1
+
+            if (j>1) and (i>0) and ((i-1,j-2) in join_cluster_ij and Grid_states[i-1,j-2] == atomic_specie): # Left down
+                self.allowed_events[13] = 1
+                
+            """
+            Right up and down
+            """
+            if (i<length_x) and (j<length_y) and ((i+1,j+1) in join_cluster_ij and Grid_states[i+1,j+1] == atomic_specie): # Right up
+                self.allowed_events[14] = 1
+                
+            if (i>0) and (j<length_y) and ((i-1,j+1) in join_cluster_ij and Grid_states[i-1,j+1] == atomic_specie): # Right down
+                self.allowed_events[15] = 1
+                
+                
+
+        if ((i>0) and (Grid_states[i-1,j] == 1)) or ((i<length_x) and (Grid_states[i+1,j] == 1)):
+        # S
+        # 3: Mo (Grid_states) Right Mo --------------------------------------------
+        # S
+        
+            self.allowed_events[0] = 3 # Right Mo
+            
+            """
+            Up and down
+            """
+            if (i>1) and ((i-2,j) in join_cluster_ij and Grid_states[i-2,j] == atomic_specie): # Down
+               self.allowed_events[10] = 1 
+               
+            if (i<length_x-1) and ((i+2,j) in join_cluster_ij and Grid_states[i+2,j] == atomic_specie): # Up
+                self.allowed_events[11] = 1
+
+            """
+            Left up and down
+            """
+            if (j>0) and (i<length_x) and ((i+1,j-1) in join_cluster_ij and Grid_states[i+1,j-1] == atomic_specie): # Left up
+                self.allowed_events[12] = 1
+            
+            if (j>0) and (i>0) and ((i-1,j-1) in join_cluster_ij and Grid_states[i-1,j-1] == atomic_specie): # Left down
+                self.allowed_events[13] = 1
+                
+            """
+            Right up and down
+            """
+            if (i<length_x) and (j<length_y-1) and ((i+1,j+2) in join_cluster_ij and Grid_states[i+1,j+2] == atomic_specie): # Right up
+                self.allowed_events[14] = 1
+                    
+            if (i>0) and (j<length_y-1) and ((i-1,j+2) in join_cluster_ij and Grid_states[i-1,j+2] == atomic_specie): # Right down
+                self.allowed_events[15] = 1
         
         
         """
@@ -208,6 +290,7 @@ class Defects():
         j = self.j
         
         atomic_specie = self.atomic_specie
+        defect_specie = self.defect_specie
         
         # Down - Zigzag - allowed_events[1]    
         # Up - Zigzag - allowed_events[2]   
@@ -233,37 +316,37 @@ class Defects():
             """
             
         
-            if (s == 1): # Down - Zigzag
+            if (s == 1 or s == 10): # Down - Zigzag
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i-2,j] = 2
+                Grid_states[i-2,j] = defect_specie
                 self.i = i-2
                 
-            elif (s == 2): # Up - Zigzag
+            elif (s == 2 or s == 11): # Up - Zigzag
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i+2,j] = 2
+                Grid_states[i+2,j] = defect_specie
                 self.i = i+2
                 
-            elif (s == 3): # Left up - Armchair
+            elif (s == 3 or s == 12): # Left up - Armchair
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i+1,j-2] = 2
+                Grid_states[i+1,j-2] = defect_specie
                 self.i = i+1
                 self.j = j-2
             
-            elif (s == 4): # Left down - Armchair
+            elif (s == 4 or s == 13): # Left down - Armchair
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i-1,j-2] = 2
+                Grid_states[i-1,j-2] = defect_specie
                 self.i = i-1
                 self.j = j-2
                 
-            elif (s == 5): # Right up - Armchair
+            elif (s == 5 or s == 14): # Right up - Armchair
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i+1,j+1] = 2
+                Grid_states[i+1,j+1] = defect_specie
                 self.i = i+1
                 self.j = j+1
                 
-            elif (s == 6): # Right down - Armchair
+            elif (s == 6 or s == 15): # Right down - Armchair
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i-1,j+1] = 2
+                Grid_states[i-1,j+1] = defect_specie
                 self.i = i-1
                 self.j = j+1
         
@@ -273,37 +356,37 @@ class Defects():
             ---------------------- Migration ----------------------------------
             """
             
-            if (s == 1): # Down - Zigzag
+            if (s == 1 or s == 10): # Down - Zigzag
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i-2,j] = 2
+                Grid_states[i-2,j] = defect_specie
                 self.i = i-2
                 
-            elif (s == 2): # Up - Zigzag
+            elif (s == 2 or s == 11): # Up - Zigzag
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i+2,j] = 2
+                Grid_states[i+2,j] = defect_specie
                 self.i = i+2
                 
-            elif (s == 3): # Left up - Armchair
+            elif (s == 3 or s == 12): # Left up - Armchair
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i+1,j-1] = 2
+                Grid_states[i+1,j-1] = defect_specie
                 self.i = i+1
                 self.j = j-1
             
-            elif (s == 4): # Left down - Armchair
+            elif (s == 4 or s == 13): # Left down - Armchair
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i-1,j-1] = 2
+                Grid_states[i-1,j-1] = defect_specie
                 self.i = i-1
                 self.j = j-1
             
-            elif (s == 5): # Right up - Armchair
+            elif (s == 5 or s == 14): # Right up - Armchair
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i+1,j+2] = 2
+                Grid_states[i+1,j+2] = defect_specie
                 self.i = i+1
                 self.j = j+2
             
-            elif (s == 6): # Right down - Armchair
+            elif (s == 6 or s == 15): # Right down - Armchair
                 Grid_states[i,j] = atomic_specie
-                Grid_states[i-1,j+2] = 2
+                Grid_states[i-1,j+2] = defect_specie
                 self.i = i-1
                 self.j = j+2
             
@@ -432,19 +515,29 @@ class Cluster():
             if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal  
         # Grid points adjacent to the crystal, so they may join the crystal
         # Select unique elements from the list, sort them and transform into a list
-        self.join_cluster_ij = list(sorted(set(join_cluster_ij))) 
+        self.join_cluster_ij = sorted(join_cluster_ij) 
         self.Grid_states = Grid_states
                         
-    def crystal_growth(self,Grid_states,new_defect_ij):
+    def crystal_update(self,Grid_states,new_defect_ij,s,mig_defect):
         
-        self.cluster_ij.append(new_defect_ij) # New defect incorporate to the crystal
-        
-        self.clustering_region(Grid_states,[new_defect_ij]) # Check new joining sites
-        join_cluster_ij = self.join_cluster_ij   
-
-        # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 
-        self.join_cluster_ij = [x for x in self.cluster_ij+join_cluster_ij if x not in self.cluster_ij]
-        
+        if (s+1 == 7) or (s+1 == 8):
+            self.cluster_ij.append(new_defect_ij) # New defect incorporate to the crystal
+            
+            self.clustering_region(Grid_states,[new_defect_ij]) # Check new joining sites
+            #join_cluster_ij = self.join_cluster_ij   
+    
+            # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 
+            self.join_cluster_ij = [x for x in self.cluster_ij+self.join_cluster_ij if x not in self.cluster_ij]
+       
+        elif (s > 9): # Migration of atoms at the crystal edge
+            self.cluster_ij.remove(new_defect_ij) # This atoms changed his position
+            self.cluster_ij.append(mig_defect) # New position of the atom
+            
+            self.join_cluster_ij = [] # There are no valid elements. We recalculate the region
+            self.clustering_region(Grid_states,self.cluster_ij) # Check new joining sites
+            # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 
+            self.join_cluster_ij = [x for x in self.cluster_ij+self.join_cluster_ij if x not in self.cluster_ij]
+   
         # We update the Grid_states with inner points of the cluster (Grid_states = 5)
         return self.Grid_states
         

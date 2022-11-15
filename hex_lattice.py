@@ -240,7 +240,10 @@ class Hexagonal_lattice():
             while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
                 j += 1
             self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
-            #self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
+            self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
+            self.Grid_states[int(length_xv/2)-1,int(length_yv/2)+j+1] = self.defect_specie
+            self.Grid_states[int(length_xv/2)+2,int(length_yv/2)+j] = self.defect_specie
+            self.Grid_states[int(length_xv/2)-2,int(length_yv/2)+j] = self.defect_specie
 
     def crystal_seed(self):
         j = 0
