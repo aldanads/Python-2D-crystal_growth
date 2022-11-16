@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 from defects import Cluster
 import random
 from datetime import datetime
+import shutil
+import os 
 
 
 
@@ -19,7 +21,13 @@ def initialization():
     # Random seed as time
     random.seed(datetime.now())
 
+    # Default resolution for figures
     plt.rcParams["figure.dpi"] = 300 # Default value of dpi = 300
+    
+    files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py']
+    dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Growth examples\\'
+    sim_n = 4
+    dst_data = save_simulation(files_copy,dst,sim_n) # Create folders and python files
     
     """ --------------------------------------------------------------------------
      -----------------------Creating of the hexagonal grid -----------------------
@@ -33,7 +41,7 @@ def initialization():
     # Activation energies --> Adatoms
     E_mig_armchair = 1.2 # Armchair direction
     E_mig_zigzag = 1.2 # Zigzag direction
-    E_nucleation = 1.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
+    E_nucleation = 1.6 # Kink nucleation (1.7 eV) --> Growing in armchair direction
     E_propagation = 1.4 # Kink propagation (1.4 eV) --> Growing in zigzag direction
     E_desorption = 1.52
     # Activation energies --> Atoms at the crystal edge
@@ -79,7 +87,7 @@ def initialization():
     # Type of defects in the lattice
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     
-    prob_defects = 0.25
+    prob_defects = 0.001
     
     crystal_orientation = True
     pair_atom_defect=(3,4)
@@ -94,4 +102,23 @@ def initialization():
     
     MoS2_lattice.plot_lattice(crystal_orientation) # Initial state of the grid
     
-    return MoS2_lattice,MoS2_crystal,distribution_parameters
+    return MoS2_lattice,MoS2_crystal,distribution_parameters, dst_data
+
+def save_simulation(files_copy,dst,sim_n):
+    
+
+    parent_dir = 'Sim_'+str(sim_n)+'\\'
+    os.makedirs(dst+parent_dir) 
+    dst = dst+parent_dir
+    program_directory = 'Program\\'
+    data_directoy = 'Crystal growth\\'
+
+    os.makedirs(dst + program_directory)
+    os.makedirs(dst + data_directoy)
+
+    dst_program = dst + program_directory
+
+    for files in files_copy:
+        shutil.copyfile(files, dst_program+files)
+        
+    return dst + data_directoy

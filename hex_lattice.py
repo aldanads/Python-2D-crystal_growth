@@ -63,30 +63,33 @@ class Hexagonal_lattice():
             
         
     
-    def plot_lattice(self,crystal_orientation = False):
+    def plot_lattice(self,crystal_orientation = False, path = '',t=0,i=0):
         
         # Sulfur atomic radius: 100 pm
         # Moldibdenum atomic radius: 139 pm
         # Change s to make them in scale
-        plt.scatter(self.xv[1::2,0::3],self.yv[1::2,0::3],color = self.atom_colors[0],s=1) # Sulfur
-        plt.scatter(self.xv[0::2,1::3],self.yv[0::2,1::3],color = self.atom_colors[0],s=1) # Sulfur
-        plt.scatter(self.xv[0::2,0::3],self.yv[0::2,0::3],color = self.atom_colors[1],s=1.39) # Molibdenum
-        plt.scatter(self.xv[1::2,2::3],self.yv[1::2,2::3],color = self.atom_colors[1],s=1.39) # Molibdenum
-        
-        if (type(self.Grid_states) == np.ndarray):
-            coord_xy_Vs = np.where(self.Grid_states == 2)
-            plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom_colors[2],s=5)
-            coord_xy_Vs = np.where(self.Grid_states >= 4)
-            plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom_colors[3],s=5)
-
-        if (crystal_orientation == True): # Crystal orientation
-            arrow1 = plt.arrow(self.xv[2,0],self.yv[2,0],self.x_axis/4,0,width =0.05)
-            arrow2 = plt.arrow(self.xv[2,0],self.yv[2,0],0,self.y_axis/4,width =0.05, color = 'green')
-            plt.legend([arrow1,arrow2], ['Armchair','Zigzag'])
-        plt.xlabel ("X axis (nm)")
-        plt.ylabel ("Y axis (nm)")
-
-        plt.show()
+            plt.scatter(self.xv[1::2,0::3],self.yv[1::2,0::3],color = self.atom_colors[0],s=1) # Sulfur
+            plt.scatter(self.xv[0::2,1::3],self.yv[0::2,1::3],color = self.atom_colors[0],s=1) # Sulfur
+            plt.scatter(self.xv[0::2,0::3],self.yv[0::2,0::3],color = self.atom_colors[1],s=1.39) # Molibdenum
+            plt.scatter(self.xv[1::2,2::3],self.yv[1::2,2::3],color = self.atom_colors[1],s=1.39) # Molibdenum
+            
+            if (type(self.Grid_states) == np.ndarray):
+                coord_xy_Vs = np.where(self.Grid_states == 2)
+                plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom_colors[2],s=5)
+                coord_xy_Vs = np.where(self.Grid_states >= 4)
+                plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom_colors[3],s=5)
+    
+            if (crystal_orientation == True): # Crystal orientation
+                arrow1 = plt.arrow(self.xv[2,0],self.yv[2,0],self.x_axis/4,0,width =0.05)
+                arrow2 = plt.arrow(self.xv[2,0],self.yv[2,0],0,self.y_axis/4,width =0.05, color = 'green')
+                plt.legend([arrow1,arrow2], ['Armchair','Zigzag'])
+            plt.xlabel ("X axis (nm)")
+            plt.ylabel ("Y axis (nm)")
+            
+            if path == '':
+                plt.show()
+            else:
+                plt.savefig(path+str(i)+'_t(s) = '+str(round(t,2))+' .png', dpi = 80)
     
     
     # Generic hexagonal grid
@@ -239,14 +242,19 @@ class Hexagonal_lattice():
         else:
             while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
                 j += 1
+                
+            # Defects in a hexagon
             self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
             self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
             self.Grid_states[int(length_xv/2)-1,int(length_yv/2)+j+1] = self.defect_specie
             self.Grid_states[int(length_xv/2)+2,int(length_yv/2)+j] = self.defect_specie
             self.Grid_states[int(length_xv/2)-2,int(length_yv/2)+j] = self.defect_specie
-            self.Grid_states[int(length_xv/2)-4,int(length_yv/2)+j] = self.defect_specie
-            self.Grid_states[int(length_xv/2)-3,int(length_yv/2)+j+1] = self.defect_specie
             self.Grid_states[int(length_xv/2)-1,int(length_yv/2)+j-2] = self.defect_specie
+            self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j-2] = self.defect_specie
+
+            
+            #self.Grid_states[int(length_xv/2)-4,int(length_yv/2)+j] = self.defect_specie
+            #self.Grid_states[int(length_xv/2)-3,int(length_yv/2)+j+1] = self.defect_specie
 
 
     def crystal_seed(self):

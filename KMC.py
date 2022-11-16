@@ -33,8 +33,8 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
         distribution = distribution_parameters[0]
         skewness = distribution_parameters[1] 
         fissure_region = distribution_parameters[2] 
-        #prob_defects = distribution_parameters[4]
-        prob_defects = 0.001
+        prob_defects = distribution_parameters[4]
+  
 
         MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution,pair_atom_defect)
 

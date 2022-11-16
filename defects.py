@@ -534,9 +534,6 @@ class Cluster():
 
         elif (s+1 > 9): # Migration of atoms at the crystal edge
         
-            """
-            There are some kind of error here --> It doesn't update the cluster_ij'
-            """
             self.cluster_ij.remove(new_defect_ij) # This atoms changed his position
             self.cluster_ij.append(mig_defect) # New position of the atom
             self.join_cluster_ij = [] # There are no valid elements. We recalculate the region
