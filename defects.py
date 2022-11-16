@@ -173,7 +173,8 @@ class Defects():
         j = self.j
         
         # If the atom is surrounded by more than 2 other atoms, it is immobile
-        if sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4)) > 4: return
+        # Minus 1 because we don't take into account the defect at the center (i,j)
+        if sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4))-1 > 2: return
 
         
         length_x = len(Grid_states)-1
@@ -185,7 +186,7 @@ class Defects():
         # That is, the defect in the edge can't jump outside the crystal during the migration process
         # Jump outside the crystal is the detach process
         join_cluster_ij = [x for x in join_cluster_ij if join_cluster_ij.count(x) > 2]
-        
+                
         
         if ((i>0) and (Grid_states[i-1,j] == 0)) or ((i<length_x) and (Grid_states[i+1,j] == 0)):
         # 0
@@ -232,6 +233,7 @@ class Defects():
             """
             Up and down
             """
+            
             if (i>1) and ((i-2,j) in join_cluster_ij and Grid_states[i-2,j] == atomic_specie): # Down
                self.allowed_events[10] = 1 
                
@@ -515,7 +517,7 @@ class Cluster():
             if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal  
         # Grid points adjacent to the crystal, so they may join the crystal
         # Select unique elements from the list, sort them and transform into a list
-        self.join_cluster_ij = sorted(join_cluster_ij) 
+        self.join_cluster_ij = join_cluster_ij 
         self.Grid_states = Grid_states
                         
     def crystal_update(self,Grid_states,new_defect_ij,s,mig_defect):
@@ -529,10 +531,14 @@ class Cluster():
             # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 
             self.join_cluster_ij = [x for x in self.cluster_ij+self.join_cluster_ij if x not in self.cluster_ij]
        
-        elif (s > 9): # Migration of atoms at the crystal edge
+
+        elif (s+1 > 9): # Migration of atoms at the crystal edge
+        
+            """
+            There are some kind of error here --> It doesn't update the cluster_ij'
+            """
             self.cluster_ij.remove(new_defect_ij) # This atoms changed his position
             self.cluster_ij.append(mig_defect) # New position of the atom
-            
             self.join_cluster_ij = [] # There are no valid elements. We recalculate the region
             self.clustering_region(Grid_states,self.cluster_ij) # Check new joining sites
             # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 

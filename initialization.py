@@ -27,18 +27,18 @@ def initialization():
     """ 
     a=0.639 # nm
     b=0.639 # nm
-    device_size = (20, 20) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+    device_size = (50, 50) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
     atom_colors=['orange','purple','blue', 'black'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
     # Activation energies --> Adatoms
     E_mig_armchair = 1.2 # Armchair direction
     E_mig_zigzag = 1.2 # Zigzag direction
-    E_nucleation = 1.6 # Kink nucleation (1.7 eV) --> Growing in armchair direction
+    E_nucleation = 1.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
     E_propagation = 1.4 # Kink propagation (1.4 eV) --> Growing in zigzag direction
-    E_desorption = 2
+    E_desorption = 1.52
     # Activation energies --> Atoms at the crystal edge
-    E_mig_armchair_edge = 2.5 # Armchair direction
-    E_mig_zigzag_edge = 2.5 # Zigzag direction
+    E_mig_armchair_edge = 3 # Armchair direction
+    E_mig_zigzag_edge = 3 # Zigzag direction
     
     Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair,
              E_nucleation,E_propagation,E_desorption,E_mig_zigzag_edge,E_mig_zigzag_edge,
@@ -79,7 +79,7 @@ def initialization():
     # Type of defects in the lattice
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     
-    prob_defects = 0.2
+    prob_defects = 0.25
     
     crystal_orientation = True
     pair_atom_defect=(3,4)

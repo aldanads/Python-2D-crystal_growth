@@ -29,7 +29,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
     pair_atom_defect = distribution_parameters[3]
 
 
-    if MoS2_lattice.n_defects < 750:
+    if MoS2_lattice.n_defects < 10000:
         distribution = distribution_parameters[0]
         skewness = distribution_parameters[1] 
         fissure_region = distribution_parameters[2] 
@@ -49,6 +49,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
         ------------- Select event with kinetic Monte Carlo technique ------
         """
         sum_TR = sum(TR)*np.random.rand()
+
         if sum_TR == 0: continue
         Pointer_event = TR[0]
         s = 0
@@ -68,7 +69,6 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
         """
         --------------------------------------------------------------------
         """
-
                 
         if np.random.rand() < event_prob:
             # Update the Grid with the chosen events
@@ -78,9 +78,9 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
 
             if (s+1 >= 7): # Update the crystal -> New adatom joined
                 Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),s,(Mo_adatom.i,Mo_adatom.j))
-
-                
+                                
         #MoS2_lattice.plot_lattice()
+
         
         
     MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
