@@ -16,7 +16,7 @@ import os
 
 
 
-def initialization():
+def initialization(E_nuc_prop,sim_n):
 
     # Random seed as time
     random.seed(datetime.now())
@@ -25,8 +25,7 @@ def initialization():
     plt.rcParams["figure.dpi"] = 300 # Default value of dpi = 300
     
     files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py']
-    dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Growth examples\\'
-    sim_n = 4
+    dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Armchair and zigzag growth rate\\'
     dst_data = save_simulation(files_copy,dst,sim_n) # Create folders and python files
     
     """ --------------------------------------------------------------------------
@@ -41,8 +40,10 @@ def initialization():
     # Activation energies --> Adatoms
     E_mig_armchair = 1.2 # Armchair direction
     E_mig_zigzag = 1.2 # Zigzag direction
-    E_nucleation = 1.6 # Kink nucleation (1.7 eV) --> Growing in armchair direction
-    E_propagation = 1.4 # Kink propagation (1.4 eV) --> Growing in zigzag direction
+    #E_nucleation = 1.6 # Kink nucleation (1.7 eV) --> Growing in armchair direction
+    #E_propagation = 1.4 # Kink propagation (1.4 eV) --> Growing in zigzag direction
+    E_nucleation = E_nuc_prop[0,n_sim]
+    E_propagation = E_nuc_prop[1,n_sim]
     E_desorption = 1.52
     # Activation energies --> Atoms at the crystal edge
     E_mig_armchair_edge = 3 # Armchair direction

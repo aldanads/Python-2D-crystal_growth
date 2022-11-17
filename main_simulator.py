@@ -8,15 +8,22 @@ from initialization import*
 from KMC import*
 import shutil
 
-MoS2_lattice, MoS2_crystal,distribution_parameters,dst_data = initialization()
-prob = np.zeros(len(MoS2_lattice.Act_E)+1)
+E_propagation = [1.4,1.4,1.4,1.4,1.4,1.3,1.4,1.5,1.6,1.7]
+E_nucleation = [1.7,1.6,1.5,1.4,1.3,1.7,1.7,1.7,1.7,1.7]
 
-for i in np.arange(100000):
-    MoS2_lattice, MoS2_crystal,Mo_adatom,prob = KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob)
+E_nuc_prop = [E_nucleation,E_propagation]
+
+for n_sim in np.arange(len(E_nuc_prop[0])):
+
+    MoS2_lattice, MoS2_crystal,distribution_parameters,dst_data = initialization(E_nuc_prop,n_sim)
+    prob = np.zeros(len(MoS2_lattice.Act_E)+1)
     
-    if i%100 == 0:
-        MoS2_lattice.plot_lattice(False,dst_data,MoS2_lattice.time[-1],i)
-        print (i,MoS2_lattice.time[-1])
+    for i in np.arange(12000):
+        MoS2_lattice, MoS2_crystal,Mo_adatom,prob = KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob)
         
-        #Proportion between adsort 
-        #print(i, MoS2_lattice.n_defects,prob[9])
+        if i%100 == 0:
+            MoS2_lattice.plot_lattice(False,dst_data,MoS2_lattice.time[-1],i)
+            print (i,MoS2_lattice.time[-1])
+            
+            #Proportion between adsort 
+            #print(i, MoS2_lattice.n_defects,prob[9])
