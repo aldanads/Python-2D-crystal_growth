@@ -63,22 +63,32 @@ class Hexagonal_lattice():
             
         
     
-    def plot_lattice(self,crystal_orientation = False, path = '',t=0,i=0):
+    def plot_lattice(self,crystal_orientation = False, path = '',t=0,i=0, grid=False,cluster_ij = False):
         
         # Sulfur atomic radius: 100 pm
         # Moldibdenum atomic radius: 139 pm
         # Change s to make them in scale
-            plt.scatter(self.xv[1::2,0::3],self.yv[1::2,0::3],color = self.atom_colors[0],s=1) # Sulfur
-            plt.scatter(self.xv[0::2,1::3],self.yv[0::2,1::3],color = self.atom_colors[0],s=1) # Sulfur
-            plt.scatter(self.xv[0::2,0::3],self.yv[0::2,0::3],color = self.atom_colors[1],s=1.39) # Molibdenum
-            plt.scatter(self.xv[1::2,2::3],self.yv[1::2,2::3],color = self.atom_colors[1],s=1.39) # Molibdenum
+        
+            if (grid == True) or self.x_axis <= 50:
+                plt.scatter(self.xv[1::2,0::3],self.yv[1::2,0::3],color = self.atom_colors[0],s=1) # Sulfur
+                plt.scatter(self.xv[0::2,1::3],self.yv[0::2,1::3],color = self.atom_colors[0],s=1) # Sulfur
+                plt.scatter(self.xv[0::2,0::3],self.yv[0::2,0::3],color = self.atom_colors[1],s=1.39) # Molibdenum
+                plt.scatter(self.xv[1::2,2::3],self.yv[1::2,2::3],color = self.atom_colors[1],s=1.39) # Molibdenum
             
             if (type(self.Grid_states) == np.ndarray):
-                coord_xy_Vs = np.where(self.Grid_states == 2)
-                plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom_colors[2],s=5)
-                coord_xy_Vs = np.where(self.Grid_states >= 4)
-                plt.scatter(self.xv[coord_xy_Vs[0],coord_xy_Vs[1]],self.yv[coord_xy_Vs[0],coord_xy_Vs[1]], color = self.atom_colors[3],s=5)
-    
+                
+                if hasattr(Hexagonal_lattice,'coord_xy_defects') == False:
+                    coord_xy_defects = np.where(self.Grid_states == 2)
+                    plt.scatter(self.xv[coord_xy_defects[0],coord_xy_defects[1]],self.yv[coord_xy_defects[0],coord_xy_defects[1]], color = self.atom_colors[2],s=5)
+                else:
+                    plt.scatter(self.xv[self.coord_xy_defects[0]],self.yv[self.coord_xy_defects[0]], color = self.atom_colors[2],s=5)
+                
+                
+                if cluster_ij == False: cluster_ij = np.where(self.Grid_states >= 4)
+                #else: cluster_ij = [[cluster_ij[i][0],cluster_ij[i][0]] for i in np.arange(len(cluster_ij))]
+                #print(len(cluster_ij[0]))
+                plt.scatter(self.xv[cluster_ij[0],cluster_ij[1]],self.yv[cluster_ij[0],cluster_ij[1]], color = self.atom_colors[3],s=5)
+
             if (crystal_orientation == True): # Crystal orientation
                 arrow1 = plt.arrow(self.xv[2,0],self.yv[2,0],self.x_axis/4,0,width =0.05)
                 arrow2 = plt.arrow(self.xv[2,0],self.yv[2,0],0,self.y_axis/4,width =0.05, color = 'green')
@@ -89,7 +99,7 @@ class Hexagonal_lattice():
             if path == '':
                 plt.show()
             else:
-                plt.savefig(path+str(i)+'_t(s) = '+str(round(t,2))+' .png', dpi = 80)
+                plt.savefig(path+str(i)+'_t(s) = '+str(round(t,5))+' .png', dpi = 100)
     
     
     # Generic hexagonal grid

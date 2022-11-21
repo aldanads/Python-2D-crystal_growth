@@ -16,7 +16,7 @@ import os
 
 
 
-def initialization(E_nuc_prop,sim_n):
+def initialization(E_nuc_prop,n_sim):
 
     # Random seed as time
     random.seed(datetime.now())
@@ -24,9 +24,11 @@ def initialization(E_nuc_prop,sim_n):
     # Default resolution for figures
     plt.rcParams["figure.dpi"] = 300 # Default value of dpi = 300
     
-    files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py']
-    dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Armchair and zigzag growth rate\\'
-    dst_data = save_simulation(files_copy,dst,sim_n) # Create folders and python files
+    save_data = False
+    if save_data == True:
+        files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py']
+        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Edge\\'
+        dst_data = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     
     """ --------------------------------------------------------------------------
      -----------------------Creating of the hexagonal grid -----------------------
@@ -40,10 +42,10 @@ def initialization(E_nuc_prop,sim_n):
     # Activation energies --> Adatoms
     E_mig_armchair = 1.2 # Armchair direction
     E_mig_zigzag = 1.2 # Zigzag direction
-    #E_nucleation = 1.6 # Kink nucleation (1.7 eV) --> Growing in armchair direction
-    #E_propagation = 1.4 # Kink propagation (1.4 eV) --> Growing in zigzag direction
-    E_nucleation = E_nuc_prop[0,n_sim]
-    E_propagation = E_nuc_prop[1,n_sim]
+    #E_nucleation = 1.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
+    #E_propagation = 1.5 # Kink propagation (1.4 eV) --> Growing in zigzag direction
+    E_nucleation = E_nuc_prop[0][n_sim]
+    E_propagation = E_nuc_prop[1][n_sim]
     E_desorption = 1.52
     # Activation energies --> Atoms at the crystal edge
     E_mig_armchair_edge = 3 # Armchair direction
@@ -82,14 +84,14 @@ def initialization(E_nuc_prop,sim_n):
     distribution = ['uniform','skewed_gaussian','triangle','test 1: single adatom','Crystal seed']
     # skewness parameter --> a=0 is the normal distribution
     skewness = 12 # Skewness of the skewed Gaussian distribution
-    fissure_region = (round(len(xv[0])/2)+2,50) # [0] middle point and [1] half width (nm)
+    fissure_region = (round(len(xv[0])/2)+2,100) # [0] middle point and [1] half width (nm)
     # Atomic specie -> Whay kind of atoms are affected by defects
     atomic_specie = 3 # Sulfur = 1 // Molibdenum = 3
     # Type of defects in the lattice
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     
+    #prob_defects = adsortion_rate[n_sim]
     prob_defects = 0.001
-    
     crystal_orientation = True
     pair_atom_defect=(3,4)
     MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[3],pair_atom_defect)
@@ -101,14 +103,15 @@ def initialization(E_nuc_prop,sim_n):
     
     MoS2_crystal = Cluster(MoS2_lattice.Grid_states) # Crystal seed
     
-    MoS2_lattice.plot_lattice(crystal_orientation) # Initial state of the grid
+    MoS2_lattice.plot_lattice(crystal_orientation,'',0,0,True) # Initial state of the grid
     
-    return MoS2_lattice,MoS2_crystal,distribution_parameters, dst_data
+    #return MoS2_lattice,MoS2_crystal,distribution_parameters, dst_data
+    return MoS2_lattice,MoS2_crystal,distribution_parameters
 
-def save_simulation(files_copy,dst,sim_n):
+def save_simulation(files_copy,dst,n_sim):
     
 
-    parent_dir = 'Sim_'+str(sim_n)+'\\'
+    parent_dir = 'Sim_'+str(n_sim)+'\\'
     os.makedirs(dst+parent_dir) 
     dst = dst+parent_dir
     program_directory = 'Program\\'

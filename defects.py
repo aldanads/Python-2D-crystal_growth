@@ -159,13 +159,92 @@ class Defects():
         # Defect in (i,j) is in contact with the cluster
         if (i,j) in join_cluster_ij: 
             
-            # Kink nucleation --> Armchair
-            # Search in a square 3x4 around (i,j) --> Remember that init:final:steps exclude final
-            if (i>0 and i < length_x and j > 1 and j < length_y-2) and (Grid_states[i-1:i+2:1,j-2:j+3:1] == 4).any():
-                self.allowed_events[7] = 1
             # Kink propagation --> Zigzag
             if ((i>1) and Grid_states[i-2,j]) == 4 or (i<length_x-1) and (Grid_states[i+2,j] == 4):
                 self.allowed_events[8] = 1 
+                
+                
+            # Kink nucleation --> Armchair
+            # Search in a square 3x4 around (i,j) --> Remember that init:final:steps exclude final
+            #if (i>0 and i < length_x and j > 1 and j < length_y-2) and (Grid_states[i-1:i+2:1,j-2:j+3:1] == 4).any():
+            #    self.allowed_events[7] = 1
+            
+            
+            # Kink nucleation --> Armchair
+            # We check if the position (i,j) have any crystal in contact
+            # Then we have to check if the position (i,j) follow a zigzag direction in diagonal
+            if ((i>0) and (Grid_states[i-1,j] == 0)) or ((i<length_x) and (Grid_states[i+1,j] == 0)):
+            # 0
+            # 2: Mo (Grid_states) Left Mo --------------------------------------------
+            # 0 
+                """
+                Check if there is a crystal at left up and down
+                """
+                if (j > 1) and (i < length_x) and (Grid_states[i+1,j-2] == 4): # Left up
+                    self.allowed_events[7] = 1
+                    if (j > 2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
+                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        return # If it is part of one zigzag row, it is enough
+                    
+    
+                if (j > 1) and (i > 0) and (Grid_states[i-1,j-2] == 4): # Left down
+                    self.allowed_events[7] = 1
+                    if (j > 2) and (i > 1) and Grid_states[i-2,j-3] >= 4: # The continuation of a diagonal zigzag row
+                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        return # If it is part of one zigzag row, it is enough
+                    
+                """
+                Check if there is a crystal at right up and down
+                """
+                if (i < length_x) and (j < length_y) and (Grid_states[i+1,j+1] == 4): # Right up
+                    self.allowed_events[7] = 1
+                    if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
+                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        return # If it is part of one zigzag row, it is enough
+                    
+                if (i > 0) and (j < length_y) and (Grid_states[i-1,j+1] == 4): # Right down
+                    self.allowed_events[7] = 1
+                    if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
+                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        return # If it is part of one zigzag row, it is enough
+            
+            
+            if ((i>0) and (Grid_states[i-1,j] == 1)) or ((i<length_x) and (Grid_states[i+1,j] == 1)):
+            # S
+            # 3: Mo (Grid_states) Right Mo --------------------------------------------
+            # S
+            
+                """
+                Check if there is a crystal at left up and down
+                """
+                if (j>0) and (i < length_x) and (Grid_states[i+1,j-1] == 4): # Left up
+                    self.allowed_events[7] = 1
+                    if (j>2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
+                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        return # If it is part of one zigzag row, it is enough
+                
+                if (j>0) and (i>0) and (Grid_states[i-1,j-1] == 4): # Left down
+                    self.allowed_events[7] = 1
+                    if (j > 2) and (i > 1) and Grid_states[i-2,j-3] >= 4: # The continuation of a diagonal zigzag row
+                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        return # If it is part of one zigzag row, it is enough
+                    
+                """
+                Check if there is a crystal at right up and down
+                """
+                if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] == 4): # Right up
+                    self.allowed_events[7] = 1
+                    if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
+                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        return # If it is part of one zigzag row, it is enough
+                        
+                if (i > 0) and (j < length_y-1) and (Grid_states[i-1,j+2] == 4): # Right down
+                    self.allowed_events[7] = 1
+                    if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
+                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        return # If it is part of one zigzag row, it is enough
+            
+
                 
     def migration_edge(self,join_cluster_ij,Grid_states):
 
@@ -174,7 +253,11 @@ class Defects():
         
         # If the atom is surrounded by more than 2 other atoms, it is immobile
         # Minus 1 because we don't take into account the defect at the center (i,j)
-        if sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4))-1 > 2: return
+        #if type(Grid_states) != np.ndarray:
+        if i == 1:
+            print(type(Grid_states))
+            print(Grid_states)
+        if (i>1) and sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4))-1 > 3: return
 
         
         length_x = len(Grid_states)-1
@@ -307,7 +390,7 @@ class Defects():
             Grid_states[i,j] = 4 
             return Grid_states
         
-        if (s == 9):
+        if (s == 9): # Desorption --> Exit the function 
             Grid_states[i,j] = 3
             return Grid_states
         
