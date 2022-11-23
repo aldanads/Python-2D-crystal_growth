@@ -487,6 +487,8 @@ class Cluster():
 
         self.cluster_ij = cluster_ij # List of tuples
         self.cluster_size = sum(sum(Grid_states == 4)) + sum(sum(Grid_states == 5))
+        self.Mo_sites = sum(sum(Grid_states > 1))
+        self.coverage = self.cluster_size / self.Mo_sites
         
         # Create a empty list --> Add tuples with coordinates where defects can 
         # joining to the cluster
@@ -627,7 +629,8 @@ class Cluster():
             
             self.clustering_region(Grid_states,[new_defect_ij]) # Check new joining sites
             #join_cluster_ij = self.join_cluster_ij   
-    
+            self.cluster_size += 1
+            self.coverage = self.cluster_size / self.Mo_sites # The coverage of the layer by the crystal          
             # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 
             self.join_cluster_ij = [x for x in self.cluster_ij+self.join_cluster_ij if x not in self.cluster_ij]
        
