@@ -41,12 +41,12 @@ class Defects():
             # Desorption - allowed_events[9]
         """
 
-        allowed_events = np.zeros(len(self.Act_E)+1)
+        self.allowed_events = np.zeros(len(self.Act_E)+1)
 
         # Adatoms --> Migrate, nucleate or desorpt
-        if self.defect_specie == 2: 
+        if Grid_states[self.i,self.j] == 2: 
     
-            self.allowed_events = allowed_events 
+            #self.allowed_events = allowed_events 
             # allowed_events[0] =
             # 2: left Mo
             # 3: right Mo
@@ -61,9 +61,9 @@ class Defects():
             self.allowed_events[9] = 1
             
         # Atoms at the edge of the crystal --> They can migrate through the edge
-        if self.defect_specie == 4:
+        if Grid_states[self.i,self.j] == 4:
             
-            self.allowed_events = allowed_events 
+            #self.allowed_events = allowed_events 
             self.migration_edge(join_cluster_ij,Grid_states)
             
             
@@ -160,7 +160,7 @@ class Defects():
         if (i,j) in join_cluster_ij: 
             
             # Kink propagation --> Zigzag
-            if ((i>1) and Grid_states[i-2,j]) == 4 or (i<length_x-1) and (Grid_states[i+2,j] == 4):
+            if (((i>1) and Grid_states[i-2,j]) >= 4) or ((i<length_x-1) and (Grid_states[i+2,j] >= 4)):
                 self.allowed_events[8] = 1 
                 
                 
@@ -180,14 +180,14 @@ class Defects():
                 """
                 Check if there is a crystal at left up and down
                 """
-                if (j > 1) and (i < length_x) and (Grid_states[i+1,j-2] == 4): # Left up
+                if (j > 1) and (i < length_x) and (Grid_states[i+1,j-2] >= 4): # Left up
                     self.allowed_events[7] = 1
                     if (j > 2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
     
-                if (j > 1) and (i > 0) and (Grid_states[i-1,j-2] == 4): # Left down
+                if (j > 1) and (i > 0) and (Grid_states[i-1,j-2] >= 4): # Left down
                     self.allowed_events[7] = 1
                     if (j > 2) and (i > 1) and Grid_states[i-2,j-3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
@@ -196,13 +196,13 @@ class Defects():
                 """
                 Check if there is a crystal at right up and down
                 """
-                if (i < length_x) and (j < length_y) and (Grid_states[i+1,j+1] == 4): # Right up
+                if (i < length_x) and (j < length_y) and (Grid_states[i+1,j+1] >= 4): # Right up
                     self.allowed_events[7] = 1
                     if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
-                if (i > 0) and (j < length_y) and (Grid_states[i-1,j+1] == 4): # Right down
+                if (i > 0) and (j < length_y) and (Grid_states[i-1,j+1] >= 4): # Right down
                     self.allowed_events[7] = 1
                     if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
@@ -217,13 +217,13 @@ class Defects():
                 """
                 Check if there is a crystal at left up and down
                 """
-                if (j>0) and (i < length_x) and (Grid_states[i+1,j-1] == 4): # Left up
+                if (j>0) and (i < length_x) and (Grid_states[i+1,j-1] >= 4): # Left up
                     self.allowed_events[7] = 1
                     if (j>2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                 
-                if (j>0) and (i>0) and (Grid_states[i-1,j-1] == 4): # Left down
+                if (j>0) and (i>0) and (Grid_states[i-1,j-1] >= 4): # Left down
                     self.allowed_events[7] = 1
                     if (j > 2) and (i > 1) and Grid_states[i-2,j-3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
@@ -232,13 +232,13 @@ class Defects():
                 """
                 Check if there is a crystal at right up and down
                 """
-                if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] == 4): # Right up
+                if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] >= 4): # Right up
                     self.allowed_events[7] = 1
                     if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                         
-                if (i > 0) and (j < length_y-1) and (Grid_states[i-1,j+2] == 4): # Right down
+                if (i > 0) and (j < length_y-1) and (Grid_states[i-1,j+2] >= 4): # Right down
                     self.allowed_events[7] = 1
                     if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
@@ -254,11 +254,7 @@ class Defects():
         # If the atom is surrounded by more than 2 other atoms, it is immobile
         # Minus 1 because we don't take into account the defect at the center (i,j)
         #if type(Grid_states) != np.ndarray:
-        if i == 1:
-            print(type(Grid_states))
-            print(Grid_states)
-        if (i>1) and sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4))-1 > 3: return
-
+        if (i>1) and sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4))-1 > 2: return
         
         length_x = len(Grid_states)-1
         length_y = len(Grid_states[0])-1
@@ -268,7 +264,7 @@ class Defects():
         # We select the position supported by at least three element of the crystal
         # That is, the defect in the edge can't jump outside the crystal during the migration process
         # Jump outside the crystal is the detach process
-        join_cluster_ij = [x for x in join_cluster_ij if join_cluster_ij.count(x) > 2]
+        join_cluster_ij = [x for x in join_cluster_ij if join_cluster_ij.count(x) > 1]
                 
         
         if ((i>0) and (Grid_states[i-1,j] == 0)) or ((i<length_x) and (Grid_states[i+1,j] == 0)):
@@ -516,12 +512,15 @@ class Cluster():
             i = cluster_ij[k][0]
             j = cluster_ij[k][1]
             join_sites = 0 # Number of free sites around a specific cluster point
+            triangle = np.zeros(3, dtype=int)+2
+
                 
             """
             //////////////////////////////// Left Mo ////////////////////////
             """
             if ((i>0) and (Grid_states[i-1,j] == 0)) or ((i<length_x) and (Grid_states[i+1,j] == 0)):
     
+
                 """
                 Up and down
                 """
@@ -530,10 +529,13 @@ class Cluster():
                 if (i>1) and (Grid_states[i-2,j] < 4): # Down
                     join_cluster_ij.append((i-2,j))    
                     join_sites += 1
+                    triangle[0] -= 1
                         
                 if (i<length_x-1) and (Grid_states[i+2,j] < 4): # Up
                     join_cluster_ij.append((i+2,j))    
                     join_sites += 1
+                    triangle[1] -= 1
+
                         
                 """
                 Left up and down
@@ -541,10 +543,14 @@ class Cluster():
                 if (j>1) and (i<length_x) and (Grid_states[i+1,j-2] < 4): # Left up
                     join_cluster_ij.append((i+1,j-2))    
                     join_sites += 1
+                    triangle[2] -= 1
+
                             
                 if (j>1) and (i>0) and (Grid_states[i-1,j-2] < 4): # Left down
                     join_cluster_ij.append((i-1,j-2))    
                     join_sites += 1
+                    triangle[2] -= 1
+
                         
                 """
                 Right up and down
@@ -552,10 +558,14 @@ class Cluster():
                 if (i<length_x) and (j<length_y) and (Grid_states[i+1,j+1] < 4): # Right up
                     join_cluster_ij.append((i+1,j+1))    
                     join_sites += 1
+                    triangle[1] -= 1
+
                                 
                 if (i>0) and (j<length_y) and (Grid_states[i-1,j+1] < 4): # Right down
                     join_cluster_ij.append((i-1,j+1))    
                     join_sites += 1
+                    triangle[0] -= 1
+
                         
                 """
                 //////////////////////////////// Right Mo ////////////////////////
@@ -569,10 +579,13 @@ class Cluster():
                 if (i>1) and (Grid_states[i-2,j] < 4): # Down
                     join_cluster_ij.append((i-2,j))    
                     join_sites += 1
+                    triangle[0] -= 1
+
                         
                 if (i<length_x-1) and (Grid_states[i+2,j] < 4): # Up
                     join_cluster_ij.append((i+2,j))    
                     join_sites += 1
+                    triangle[1] -= 1
                     
                 """
                 Left up and down
@@ -580,10 +593,12 @@ class Cluster():
                 if (j>0) and (i<length_x) and (Grid_states[i+1,j-1] < 4): # Left up
                     join_cluster_ij.append((i+1,j-1))    
                     join_sites += 1
+                    triangle[2] -= 1
                         
                 if (j>0) and (i>0) and (Grid_states[i-1,j-1] < 4): # Left down
                     join_cluster_ij.append((i-1,j-1))    
                     join_sites += 1
+                    triangle[2] -= 1
                         
                 """
                 Right up and down
@@ -591,13 +606,15 @@ class Cluster():
                 if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] < 4): # Right up
                     join_cluster_ij.append((i+1,j+2))    
                     join_sites += 1
+                    triangle[1] -= 1
                         
                 if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] < 4): # Right down
                     join_cluster_ij.append((i-1,j+2))    
                     join_sites += 1
-                    
+                    triangle[0] -= 1
         
-            if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal  
+            #if join_sites == 0: Grid_states[i,j] = 5 # Inner point of the crystal
+            if any(triangle == 2): Grid_states[i,j] = 5 # Form a triangle
         # Grid points adjacent to the crystal, so they may join the crystal
         # Select unique elements from the list, sort them and transform into a list
         self.join_cluster_ij = join_cluster_ij 

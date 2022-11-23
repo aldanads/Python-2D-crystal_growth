@@ -78,9 +78,9 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
 
             if (s+1 >= 7): # Update the crystal -> New adatom joined
                 Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),s,(Mo_adatom.i,Mo_adatom.j))
-                                
+        
         #MoS2_lattice.plot_lattice()
-
+        
         
         
     MoS2_lattice.Grid_states = Grid_states # Store the new lattice state

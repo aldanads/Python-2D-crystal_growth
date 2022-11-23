@@ -22,7 +22,7 @@ for n_sim in np.arange(1,2):
     
     for i in np.arange(10000):
         MoS2_lattice, MoS2_crystal,Mo_adatom,prob = KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob)
-        
+
         if i%100 == 0:
             #MoS2_lattice.plot_lattice(False,dst_data,MoS2_lattice.time[-1],i)
             MoS2_lattice.plot_lattice(False,'',MoS2_lattice.time[-1],i)

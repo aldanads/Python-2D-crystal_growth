@@ -255,33 +255,66 @@ class Hexagonal_lattice():
                 
             # Defects in a hexagon
             self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
-            self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
-            self.Grid_states[int(length_xv/2)-1,int(length_yv/2)+j+1] = self.defect_specie
-            self.Grid_states[int(length_xv/2)+2,int(length_yv/2)+j] = self.defect_specie
-            self.Grid_states[int(length_xv/2)-2,int(length_yv/2)+j] = self.defect_specie
-            self.Grid_states[int(length_xv/2)-1,int(length_yv/2)+j-2] = self.defect_specie
-            self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j-2] = self.defect_specie
-
-            
-            #self.Grid_states[int(length_xv/2)-4,int(length_yv/2)+j] = self.defect_specie
-            #self.Grid_states[int(length_xv/2)-3,int(length_yv/2)+j+1] = self.defect_specie
 
 
     def crystal_seed(self):
         j = 0
         length_xv = len(self.xv)
         length_yv = len(self.yv[0])
+        x = int(length_xv/2)
+        y = int(length_yv/2)
         
-        if self.Grid_states[int(length_xv/2),int(length_yv/2)] == self.atomic_specie:
-            #self.Grid_states[int(length_xv/2),int(length_yv/2)] = self.defect_specie
-            self.introduce_defects_j_row(int(length_yv/2),1)
+        if self.Grid_states[x,int(length_yv/2)] == self.atomic_specie:
+            
+            if self.Grid_states[x-1,y] == 0:
+                self.Grid_states[x,y] = self.defect_specie 
+                self.Grid_states[x+1,y+1] = self.defect_specie
+                
+                self.Grid_states[x+2,y-3] = self.defect_specie
+                self.Grid_states[x-2,y-3] = self.defect_specie
+                self.Grid_states[x,y-3] = self.defect_specie 
+
+                self.Grid_states[x-1,y-2] = self.defect_specie
+                self.Grid_states[x+1,y-2] = self.defect_specie
+            else:
+                self.Grid_states[x,y] = self.defect_specie 
+                self.Grid_states[x+1,y+2] = self.defect_specie
+                
+                self.Grid_states[x+2,y-3] = self.defect_specie
+                self.Grid_states[x-2,y-3] = self.defect_specie
+                self.Grid_states[x,y-3] = self.defect_specie 
+
+                self.Grid_states[x-1,y-1] = self.defect_specie
+                self.Grid_states[x+1,y-1] = self.defect_specie
+                
 
         else:
             while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
                 j += 1
                 
-            self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
-            #self.Grid_states[int(length_xv/2)+1,int(length_yv/2)+j+1] = self.defect_specie
+            if self.Grid_states[x-1,y] == 0:
+  
+                self.Grid_states[x,y+j] = self.defect_specie 
+                self.Grid_states[x+1,y+j+1] = self.defect_specie
+                
+                self.Grid_states[x+2,y+j-3] = self.defect_specie
+                self.Grid_states[x-2,y+j-3] = self.defect_specie
+                self.Grid_states[x,y+j-3] = self.defect_specie 
+
+                self.Grid_states[x-1,y+j-2] = self.defect_specie
+                self.Grid_states[x+1,y+j-2] = self.defect_specie
+                
+            else:
+                
+                self.Grid_states[x,y] = self.defect_specie 
+                self.Grid_states[x+1,y+j+2] = self.defect_specie
+                
+                self.Grid_states[x+2,y+j-3] = self.defect_specie
+                self.Grid_states[x-2,y+j-3] = self.defect_specie
+                self.Grid_states[x,y-3] = self.defect_specie 
+
+                self.Grid_states[x-1,y+j-1] = self.defect_specie
+                self.Grid_states[x+1,y+j-1] = self.defect_specie
             
         
             

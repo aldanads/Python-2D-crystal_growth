@@ -91,10 +91,11 @@ def initialization(E_nuc_prop,n_sim):
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     
     #prob_defects = adsortion_rate[n_sim]
+    #prob_defects = 0.001
     prob_defects = 0.001
     crystal_orientation = True
     pair_atom_defect=(3,4)
-    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[3],pair_atom_defect)
+    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[4],pair_atom_defect)
     pair_atom_defect = (atomic_specie,defect_specie)
     MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect)
     
