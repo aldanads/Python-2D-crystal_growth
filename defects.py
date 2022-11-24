@@ -9,11 +9,24 @@ import numpy as np
 class Defects():
     
     
-    def __init__(self,i,j,Act_E,atomic_specie,T,Grid_states,join_cluster_ij,defect_specie):
+    def __init__(self,i,j,Backup_energy,atomic_specie,T,Grid_states,join_cluster_ij,defect_specie):
         
         self.i = i
         self.j = j
-        self.Act_E = Act_E
+        self.Backup_energy = Backup_energy
+        # Backup_energy[0] - zigzag
+        # Backup_energy[1] - armchair
+        # Backup_energy[2] - nucleation
+        # Backup_energy[3] - propagation
+        # Backup_energy[4] - desorption
+        # Backup_energy[5] - E_mig_zigzag_edge
+        # Backup_energy[6] - E_mig_armchair_edge
+
+        self.Act_E =[Backup_energy[0],Backup_energy[0],Backup_energy[1],Backup_energy[1],Backup_energy[1],Backup_energy[1],
+                     Backup_energy[2],
+                     Backup_energy[4],
+                     Backup_energy[5],Backup_energy[5],Backup_energy[6],Backup_energy[6],Backup_energy[6],Backup_energy[6]]
+
         self.atomic_specie = atomic_specie
         self.defect_specie = defect_specie
         
@@ -37,9 +50,8 @@ class Defects():
             # Right up - Armchair - allowed_events[5]
             # Right down - Armchair - allowed_events[6]
             # Nucleation - allowed_events[7]
-            # Propagation - allowed_events[8]
-            # Desorption - allowed_events[9]
-            # 
+            # Desorption - allowed_events[8]
+            # Migration edge - allowed_events[9-14]
         """
 
         self.allowed_events = np.zeros(len(self.Act_E)+1)
@@ -55,11 +67,11 @@ class Defects():
             # 0: forbidden
             # 1: allowed
             
+            self.mig_available(Grid_states) # Migration
+
             self.nucleation_available(join_cluster_ij,Grid_states) # Nucleation/propagation
             
-            self.mig_available(Grid_states) # Migration
-            
-            self.allowed_events[9] = 1
+            self.allowed_events[8] = 1
             
         # Atoms at the edge of the crystal --> They can migrate through the edge
         if Grid_states[self.i,self.j] == 4:
@@ -69,7 +81,7 @@ class Defects():
             
             
         
-        # Function: Check possible migration routes
+    # Function: Check possible migration routes
     def mig_available(self,Grid_states):
         
         length_x = len(Grid_states)-1
@@ -147,7 +159,8 @@ class Defects():
                     
             if (i>0) and (j<length_y-1) and (Grid_states[i-1,j+2] == atomic_specie): # Right down
                 self.allowed_events[6] = 1
-                        
+            
+    # Calculate the nucleation region
     def nucleation_available(self,join_cluster_ij,Grid_states):
         
         i = self.i
@@ -162,8 +175,9 @@ class Defects():
             
             # Kink propagation --> Zigzag
             if (((i>1) and Grid_states[i-2,j]) >= 4) or ((i<length_x-1) and (Grid_states[i+2,j] >= 4)):
-                self.allowed_events[8] = 1 
-                
+                self.allowed_events[7] = 1
+                self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                return  # If it is part of one zigzag, it is enough
                 
             # Kink nucleation --> Armchair
             # Search in a square 3x4 around (i,j) --> Remember that init:final:steps exclude final
@@ -184,14 +198,14 @@ class Defects():
                 if (j > 1) and (i < length_x) and (Grid_states[i+1,j-2] >= 4): # Left up
                     self.allowed_events[7] = 1
                     if (j > 2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
     
                 if (j > 1) and (i > 0) and (Grid_states[i-1,j-2] >= 4): # Left down
                     self.allowed_events[7] = 1
                     if (j > 2) and (i > 1) and Grid_states[i-2,j-3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
                 """
@@ -200,13 +214,13 @@ class Defects():
                 if (i < length_x) and (j < length_y) and (Grid_states[i+1,j+1] >= 4): # Right up
                     self.allowed_events[7] = 1
                     if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
                 if (i > 0) and (j < length_y) and (Grid_states[i-1,j+1] >= 4): # Right down
                     self.allowed_events[7] = 1
                     if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
             
             
@@ -221,13 +235,13 @@ class Defects():
                 if (j>0) and (i < length_x) and (Grid_states[i+1,j-1] >= 4): # Left up
                     self.allowed_events[7] = 1
                     if (j>2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                 
                 if (j>0) and (i>0) and (Grid_states[i-1,j-1] >= 4): # Left down
                     self.allowed_events[7] = 1
                     if (j > 2) and (i > 1) and Grid_states[i-2,j-3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
                 """
@@ -236,17 +250,16 @@ class Defects():
                 if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] >= 4): # Right up
                     self.allowed_events[7] = 1
                     if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                         
                 if (i > 0) and (j < length_y-1) and (Grid_states[i-1,j+2] >= 4): # Right down
                     self.allowed_events[7] = 1
                     if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Act_E[7] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
             
-
-                
+    # Migration of atoms at the edge of the crystal
     def migration_edge(self,join_cluster_ij,Grid_states):
 
         i = self.i
@@ -278,28 +291,28 @@ class Defects():
             Up and down
             """
             if (i>1) and ((i-2,j) in join_cluster_ij and Grid_states[i-2,j] == atomic_specie): # Down
-               self.allowed_events[10] = 1 
+               self.allowed_events[9] = 1 
                
             if (i<length_x-1) and ((i+2,j) in join_cluster_ij and Grid_states[i+2,j] == atomic_specie): # Up
-                self.allowed_events[11] = 1
+                self.allowed_events[10] = 1
                 
             """
             Left up and down
             """
             if (j>1) and (i<length_x) and ((i+1,j-2) in join_cluster_ij and Grid_states[i+1,j-2] == atomic_specie): # Left up
-                self.allowed_events[12] = 1
+                self.allowed_events[11] = 1
 
             if (j>1) and (i>0) and ((i-1,j-2) in join_cluster_ij and Grid_states[i-1,j-2] == atomic_specie): # Left down
-                self.allowed_events[13] = 1
+                self.allowed_events[12] = 1
                 
             """
             Right up and down
             """
             if (i<length_x) and (j<length_y) and ((i+1,j+1) in join_cluster_ij and Grid_states[i+1,j+1] == atomic_specie): # Right up
-                self.allowed_events[14] = 1
+                self.allowed_events[13] = 1
                 
             if (i>0) and (j<length_y) and ((i-1,j+1) in join_cluster_ij and Grid_states[i-1,j+1] == atomic_specie): # Right down
-                self.allowed_events[15] = 1
+                self.allowed_events[14] = 1
                 
                 
 
@@ -315,28 +328,28 @@ class Defects():
             """
             
             if (i>1) and ((i-2,j) in join_cluster_ij and Grid_states[i-2,j] == atomic_specie): # Down
-               self.allowed_events[10] = 1 
+               self.allowed_events[9] = 1 
                
             if (i<length_x-1) and ((i+2,j) in join_cluster_ij and Grid_states[i+2,j] == atomic_specie): # Up
-                self.allowed_events[11] = 1
+                self.allowed_events[10] = 1
 
             """
             Left up and down
             """
             if (j>0) and (i<length_x) and ((i+1,j-1) in join_cluster_ij and Grid_states[i+1,j-1] == atomic_specie): # Left up
-                self.allowed_events[12] = 1
+                self.allowed_events[11] = 1
             
             if (j>0) and (i>0) and ((i-1,j-1) in join_cluster_ij and Grid_states[i-1,j-1] == atomic_specie): # Left down
-                self.allowed_events[13] = 1
+                self.allowed_events[12] = 1
                 
             """
             Right up and down
             """
             if (i<length_x) and (j<length_y-1) and ((i+1,j+2) in join_cluster_ij and Grid_states[i+1,j+2] == atomic_specie): # Right up
-                self.allowed_events[14] = 1
+                self.allowed_events[13] = 1
                     
             if (i>0) and (j<length_y-1) and ((i-1,j+2) in join_cluster_ij and Grid_states[i-1,j+2] == atomic_specie): # Right down
-                self.allowed_events[15] = 1
+                self.allowed_events[14] = 1
         
         
         """
@@ -374,20 +387,23 @@ class Defects():
         atomic_specie = self.atomic_specie
         defect_specie = self.defect_specie
         
-        # Down - Zigzag - allowed_events[1]    
-        # Up - Zigzag - allowed_events[2]   
-        # Left up - Armchair - allowed_events[3]
-        # Left down - Armchair - allowed_events[4]
-        # Right up - Armchair - allowed_events[5]
-        # Right down - Armchair - allowed_events[6]
-        # Kink nucleation - allowed_events[7]
-        # Kink propagation - allowed_events[8]
-        # Desorption - allowed_events[9]
-        if (s == 7) or (s == 8): # The defect join the cluster -> Exit the function
+        """ Adatom migration: Mo migrating to Mo positions
+            # Mo left (2) or Mo right (3) allowed_events[0]
+            # Down - Zigzag - allowed_events[1]    
+            # Up - Zigzag - allowed_events[2]   
+            # Left up - Armchair - allowed_events[3]
+            # Left down - Armchair - allowed_events[4]
+            # Right up - Armchair - allowed_events[5]
+            # Right down - Armchair - allowed_events[6]
+            # Nucleation - allowed_events[7]
+            # Desorption - allowed_events[8]
+            # Migration edge - allowed_events[9-14]
+        """
+        if (s == 7): # The defect join the cluster -> Exit the function
             Grid_states[i,j] = 4 
             return Grid_states
         
-        if (s == 9): # Desorption --> Exit the function 
+        if (s == 8): # Desorption --> Exit the function 
             Grid_states[i,j] = 3
             return Grid_states
         
@@ -398,35 +414,35 @@ class Defects():
             """
             
         
-            if (s == 1 or s == 10): # Down - Zigzag
+            if (s == 1 or s == 9): # Down - Zigzag
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i-2,j] = defect_specie
                 self.i = i-2
                 
-            elif (s == 2 or s == 11): # Up - Zigzag
+            elif (s == 2 or s == 10): # Up - Zigzag
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i+2,j] = defect_specie
                 self.i = i+2
                 
-            elif (s == 3 or s == 12): # Left up - Armchair
+            elif (s == 3 or s == 11): # Left up - Armchair
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i+1,j-2] = defect_specie
                 self.i = i+1
                 self.j = j-2
             
-            elif (s == 4 or s == 13): # Left down - Armchair
+            elif (s == 4 or s == 12): # Left down - Armchair
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i-1,j-2] = defect_specie
                 self.i = i-1
                 self.j = j-2
                 
-            elif (s == 5 or s == 14): # Right up - Armchair
+            elif (s == 5 or s == 13): # Right up - Armchair
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i+1,j+1] = defect_specie
                 self.i = i+1
                 self.j = j+1
                 
-            elif (s == 6 or s == 15): # Right down - Armchair
+            elif (s == 6 or s == 14): # Right down - Armchair
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i-1,j+1] = defect_specie
                 self.i = i-1
@@ -438,35 +454,35 @@ class Defects():
             ---------------------- Migration ----------------------------------
             """
             
-            if (s == 1 or s == 10): # Down - Zigzag
+            if (s == 1 or s == 9): # Down - Zigzag
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i-2,j] = defect_specie
                 self.i = i-2
                 
-            elif (s == 2 or s == 11): # Up - Zigzag
+            elif (s == 2 or s == 10): # Up - Zigzag
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i+2,j] = defect_specie
                 self.i = i+2
                 
-            elif (s == 3 or s == 12): # Left up - Armchair
+            elif (s == 3 or s == 11): # Left up - Armchair
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i+1,j-1] = defect_specie
                 self.i = i+1
                 self.j = j-1
             
-            elif (s == 4 or s == 13): # Left down - Armchair
+            elif (s == 4 or s == 12): # Left down - Armchair
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i-1,j-1] = defect_specie
                 self.i = i-1
                 self.j = j-1
             
-            elif (s == 5 or s == 14): # Right up - Armchair
+            elif (s == 5 or s == 13): # Right up - Armchair
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i+1,j+2] = defect_specie
                 self.i = i+1
                 self.j = j+2
             
-            elif (s == 6 or s == 15): # Right down - Armchair
+            elif (s == 6 or s == 14): # Right down - Armchair
                 Grid_states[i,j] = atomic_specie
                 Grid_states[i-1,j+2] = defect_specie
                 self.i = i-1
@@ -625,7 +641,13 @@ class Cluster():
                         
     def crystal_update(self,Grid_states,new_defect_ij,s,mig_defect):
         
-        if (s+1 == 7) or (s+1 == 8):
+        
+        """ 
+            # Nucleation - allowed_events[7]
+            # Desorption - allowed_events[8]
+            # Migration edge - allowed_events[9-14]
+        """
+        if (s+1 == 7): # Nucleation
             self.cluster_ij.append(new_defect_ij) # New defect incorporate to the crystal
             
             self.clustering_region(Grid_states,[new_defect_ij]) # Check new joining sites
@@ -636,7 +658,7 @@ class Cluster():
             self.join_cluster_ij = [x for x in self.cluster_ij+self.join_cluster_ij if x not in self.cluster_ij]
        
 
-        elif (s+1 > 9): # Migration of atoms at the crystal edge
+        elif (s+1 > 8): # Migration of atoms at the crystal edge
         
             self.cluster_ij.remove(new_defect_ij) # This atoms changed his position
             self.cluster_ij.append(mig_defect) # New position of the atom

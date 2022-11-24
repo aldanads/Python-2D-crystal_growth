@@ -42,8 +42,9 @@ def initialization(E_nuc_prop,n_sim,save_data):
     atom_colors=['orange','purple','blue', 'black'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
     # Activation energies --> Adatoms
-    E_mig_armchair = 1.2 # Armchair direction
     E_mig_zigzag = 1.2 # Zigzag direction
+    E_mig_armchair = 1.2 # Armchair direction
+
     #E_nucleation = 1.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
     #E_propagation = 1.5 # Kink propagation (1.4 eV) --> Growing in zigzag direction
     E_nucleation = E_nuc_prop[0][n_sim]
@@ -53,9 +54,7 @@ def initialization(E_nuc_prop,n_sim,save_data):
     E_mig_armchair_edge = 3 # Armchair direction
     E_mig_zigzag_edge = 3 # Zigzag direction
     
-    Act_E = [E_mig_zigzag,E_mig_zigzag,E_mig_armchair,E_mig_armchair,E_mig_armchair,E_mig_armchair,
-             E_nucleation,E_propagation,E_desorption,E_mig_zigzag_edge,E_mig_zigzag_edge,
-             E_mig_armchair_edge,E_mig_armchair_edge,E_mig_armchair_edge,E_mig_armchair_edge]
+    Backup_energy = [E_mig_zigzag,E_mig_armchair,E_nucleation,E_propagation,E_desorption,E_mig_zigzag_edge,E_mig_armchair_edge]
     
     # Temperature
     T = 1273
@@ -74,7 +73,7 @@ def initialization(E_nuc_prop,n_sim,save_data):
     """
     
     # Create MoS2 crystal
-    MoS2_lattice = Hexagonal_lattice(a,b,device_size,atom_colors,Act_E,T)
+    MoS2_lattice = Hexagonal_lattice(a,b,device_size,atom_colors,Backup_energy,T)
     xv=MoS2_lattice.xv
     """
     distribution:

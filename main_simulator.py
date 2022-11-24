@@ -19,7 +19,7 @@ E_nuc_prop = [E_nucleation,E_propagation]
 for n_sim in np.arange(0,len(E_nucleation)):
 
     MoS2_lattice, MoS2_crystal,distribution_parameters,dst_data = initialization(E_nuc_prop,n_sim,save_data)
-    prob = np.zeros(len(MoS2_lattice.Act_E)+1)
+    prob = np.zeros(15) # Probability of events
     
     i = 0
     while MoS2_crystal.coverage < 0.25:
@@ -29,7 +29,7 @@ for n_sim in np.arange(0,len(E_nucleation)):
         if i%1 == 0:
             MoS2_lattice.plot_lattice(False,dst_data,MoS2_lattice.time[-1],i,False,MoS2_crystal.cluster_ij)
             print ('Step: ',i, ' Time (s): ',round(MoS2_lattice.time[-1],4),' Coverage (%): ',round(100*MoS2_crystal.coverage,4))
-    #    break
+        #break
     #break
             #Proportion between adsort 
             #print(i, MoS2_lattice.n_defects,prob[9])

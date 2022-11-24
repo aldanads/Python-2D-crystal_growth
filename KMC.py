@@ -12,6 +12,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
     
     Grid_states = MoS2_lattice.Grid_states # 
     T = MoS2_lattice.T # Crystal temperature 
+
     
     """
     ----- Coordinates and labels of adatoms and defects at the crystal edge ---
@@ -42,14 +43,14 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
     for i in np.arange(len(xy_adatom_edge)):
 
     
-        Mo_adatom = Defects(xy_adatom_edge[i][0],xy_adatom_edge[i][1],MoS2_lattice.Act_E,pair_atom_defect[0],T,Grid_states,MoS2_crystal.join_cluster_ij,l_defect_species[i])
+        Mo_adatom = Defects(xy_adatom_edge[i][0],xy_adatom_edge[i][1],MoS2_lattice.Backup_energy,pair_atom_defect[0],T,Grid_states,MoS2_crystal.join_cluster_ij,l_defect_species[i])
         TR = Mo_adatom.TR # Transition rates
         
         """
         ------------- Select event with kinetic Monte Carlo technique ------
         """
         sum_TR = sum(TR)*np.random.rand()
-
+        
         if sum_TR == 0: continue
         Pointer_event = TR[0]
         s = 0
@@ -69,7 +70,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,prob):
         """
         --------------------------------------------------------------------
         """
-                
+        
         if np.random.rand() < event_prob:
             # Update the Grid with the chosen events
             Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) 

@@ -15,13 +15,13 @@ from scipy.stats import skewnorm
 
 class Hexagonal_lattice():
     
-    def __init__(self,a,b,device_size,atom_colors,Act_E,T):
+    def __init__(self,a,b,device_size,atom_colors,Backup_energy,T):
         self.a = a
         self.b = b
         self.x_axis = device_size[0]
         self.y_axis = device_size[1]
         self.atom_colors = atom_colors
-        self.Act_E = Act_E
+        self.Backup_energy = Backup_energy
         self.T = T
         self.time = [0]
         
@@ -86,6 +86,7 @@ class Hexagonal_lattice():
                 
                 if cluster_ij == False: cluster_ij = np.where(self.Grid_states >= 4)
                 else: 
+                    # Transform the list of tuples to a tuple with two lists
                     aux = np.asarray(cluster_ij)
                     cluster_ij = ([aux[i][0] for i in np.arange(len(aux))],[aux[i][1] for i in np.arange(len(aux))])
                 plt.scatter(self.xv[cluster_ij[0],cluster_ij[1]],self.yv[cluster_ij[0],cluster_ij[1]], color = self.atom_colors[3],s=5)
@@ -247,14 +248,16 @@ class Hexagonal_lattice():
         j = 0
         length_xv = len(self.xv)
         length_yv = len(self.yv[0])
+        x = int(length_xv/2)
+        y = int(length_yv/2)
 
-        if self.Grid_states[int(length_xv/2),int(length_yv/2)] == self.atomic_specie:
-            self.Grid_states[int(length_xv/2),int(length_yv/2)] = self.defect_specie
+        if self.Grid_states[x,y] == self.atomic_specie:
+            self.Grid_states[x,y] = self.defect_specie
         else:
-            while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
+            while self.Grid_states[x,y+j] != self.atomic_specie:
                 j += 1
                 
-            self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
+            self.Grid_states[x,y+j] = self.defect_specie 
 
 
     def crystal_seed(self):
@@ -296,6 +299,7 @@ class Hexagonal_lattice():
   
                 self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+1] = self.defect_specie
+                #self.Grid_states[x+1,y+j+1] = 2
                 
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
                 self.Grid_states[x-2,y+j-3] = self.defect_specie
@@ -308,6 +312,8 @@ class Hexagonal_lattice():
                 
                 self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+2] = self.defect_specie
+                #self.Grid_states[x+1,y+j+1] = 2
+
                 
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
                 self.Grid_states[x-2,y+j-3] = self.defect_specie
