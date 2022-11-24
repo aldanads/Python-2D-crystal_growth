@@ -16,7 +16,7 @@ import os
 
 
 
-def initialization(E_nuc_prop,n_sim):
+def initialization(E_nuc_prop,n_sim,save_data):
 
     # Random seed as time
     random.seed(datetime.now())
@@ -24,11 +24,13 @@ def initialization(E_nuc_prop,n_sim):
     # Default resolution for figures
     plt.rcParams["figure.dpi"] = 300 # Default value of dpi = 300
     
-    save_data = False
-    if save_data == True:
+    if save_data:
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py']
-        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Edge\\'
+        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles\Zigzag_armchair\\'
         dst_data = save_simulation(files_copy,dst,n_sim) # Create folders and python files
+    else:
+        dst_data = ''
+        
     
     """ --------------------------------------------------------------------------
      -----------------------Creating of the hexagonal grid -----------------------
@@ -36,7 +38,7 @@ def initialization(E_nuc_prop,n_sim):
     """ 
     a=0.639 # nm
     b=0.639 # nm
-    device_size = (50, 50) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+    device_size = (5, 5) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
     atom_colors=['orange','purple','blue', 'black'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
     # Activation energies --> Adatoms
@@ -106,8 +108,7 @@ def initialization(E_nuc_prop,n_sim):
     
     MoS2_lattice.plot_lattice(crystal_orientation,'',0,0,True) # Initial state of the grid
     
-    #return MoS2_lattice,MoS2_crystal,distribution_parameters, dst_data
-    return MoS2_lattice,MoS2_crystal,distribution_parameters
+    return MoS2_lattice,MoS2_crystal,distribution_parameters, dst_data
 
 def save_simulation(files_copy,dst,n_sim):
     

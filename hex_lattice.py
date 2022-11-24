@@ -77,16 +77,17 @@ class Hexagonal_lattice():
             
             if (type(self.Grid_states) == np.ndarray):
                 
-                if hasattr(Hexagonal_lattice,'coord_xy_defects') == False:
+                if hasattr(self,'coord_xy_defects') == False:
                     coord_xy_defects = np.where(self.Grid_states == 2)
                     plt.scatter(self.xv[coord_xy_defects[0],coord_xy_defects[1]],self.yv[coord_xy_defects[0],coord_xy_defects[1]], color = self.atom_colors[2],s=5)
                 else:
-                    plt.scatter(self.xv[self.coord_xy_defects[0]],self.yv[self.coord_xy_defects[0]], color = self.atom_colors[2],s=5)
+                    plt.scatter(self.xv[self.coord_xy_defects[0],self.coord_xy_defects[1]],self.yv[self.coord_xy_defects[0],self.coord_xy_defects[1]], color = self.atom_colors[2],s=5)
                 
                 
                 if cluster_ij == False: cluster_ij = np.where(self.Grid_states >= 4)
-                #else: cluster_ij = [[cluster_ij[i][0],cluster_ij[i][0]] for i in np.arange(len(cluster_ij))]
-                #print(len(cluster_ij[0]))
+                else: 
+                    aux = np.asarray(cluster_ij)
+                    cluster_ij = ([aux[i][0] for i in np.arange(len(aux))],[aux[i][1] for i in np.arange(len(aux))])
                 plt.scatter(self.xv[cluster_ij[0],cluster_ij[1]],self.yv[cluster_ij[0],cluster_ij[1]], color = self.atom_colors[3],s=5)
 
             if (crystal_orientation == True): # Crystal orientation
@@ -253,7 +254,6 @@ class Hexagonal_lattice():
             while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
                 j += 1
                 
-            # Defects in a hexagon
             self.Grid_states[int(length_xv/2),int(length_yv/2)+j] = self.defect_specie 
 
 
@@ -264,8 +264,7 @@ class Hexagonal_lattice():
         x = int(length_xv/2)
         y = int(length_yv/2)
         
-        if self.Grid_states[x,int(length_yv/2)] == self.atomic_specie:
-            
+        if self.Grid_states[x,y] == self.atomic_specie:
             if self.Grid_states[x-1,y] == 0:
                 self.Grid_states[x,y] = self.defect_specie 
                 self.Grid_states[x+1,y+1] = self.defect_specie
@@ -289,10 +288,11 @@ class Hexagonal_lattice():
                 
 
         else:
-            while self.Grid_states[int(length_xv/2),int(length_yv/2)+j] != self.atomic_specie:
+            while self.Grid_states[x,y+j] != self.atomic_specie:
                 j += 1
                 
-            if self.Grid_states[x-1,y] == 0:
+
+            if self.Grid_states[x-1,y+j] == 0:
   
                 self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+1] = self.defect_specie
@@ -306,7 +306,7 @@ class Hexagonal_lattice():
                 
             else:
                 
-                self.Grid_states[x,y] = self.defect_specie 
+                self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+2] = self.defect_specie
                 
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
@@ -322,10 +322,11 @@ class Hexagonal_lattice():
         
         n_defects = np.count_nonzero(self.Grid_states == 2)
         coord_xy_defects = np.where(self.Grid_states == 2)
+        self.coord_xy_defects = coord_xy_defects
         self.n_defects = n_defects
         # Transform the coordinate in a list of tuples --> Easier to compare with other tuples
         coord_xy_defects = [(coord_xy_defects[0][i],coord_xy_defects[1][i]) for i in np.arange(len(coord_xy_defects[0]))]
-        self.coord_xy_defects = coord_xy_defects
+        #self.coord_xy_defects = coord_xy_defects
         
         return coord_xy_defects
         

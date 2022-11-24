@@ -39,6 +39,7 @@ class Defects():
             # Nucleation - allowed_events[7]
             # Propagation - allowed_events[8]
             # Desorption - allowed_events[9]
+            # 
         """
 
         self.allowed_events = np.zeros(len(self.Act_E)+1)
@@ -261,7 +262,7 @@ class Defects():
         atomic_specie = self.atomic_specie
 
     
-        # We select the position supported by at least three element of the crystal
+        # We select the position supported by at least two atoms of the crystal
         # That is, the defect in the edge can't jump outside the crystal during the migration process
         # Jump outside the crystal is the detach process
         join_cluster_ij = [x for x in join_cluster_ij if join_cluster_ij.count(x) > 1]
@@ -514,7 +515,7 @@ class Cluster():
             i = cluster_ij[k][0]
             j = cluster_ij[k][1]
             join_sites = 0 # Number of free sites around a specific cluster point
-            triangle = np.zeros(3, dtype=int)+2
+            triangle = np.zeros(3, dtype=int)+2 # Borders of the domain turn Grid_states[i,j] = 5
 
                 
             """
