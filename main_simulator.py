@@ -8,15 +8,15 @@ from initialization import*
 from KMC import*
 import shutil
 
-save_data = False
+save_data = True
 
-adsortion_rate = [0.001,0.0008,0.0006,0.0004,0.0002,0.00001]
+adsortion_rate = [0.0004,0.0002,0.00001]
 E_nucleation = 1.6
 E_propagation = 1.3
 
 parameters = [E_nucleation,E_propagation,adsortion_rate]
 
-for n_sim in np.arange(4,len(adsortion_rate)):
+for n_sim in np.arange(0,len(adsortion_rate)):
 
     MoS2_lattice, MoS2_crystal,distribution_parameters,dst_data,rng = initialization(parameters,n_sim,save_data)
     events = [np.zeros(15),np.zeros(15)]

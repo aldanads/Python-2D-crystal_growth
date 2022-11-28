@@ -309,7 +309,6 @@ class Hexagonal_lattice():
   
                 self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+1] = self.defect_specie
-                self.Grid_states[x+1,y+j+1] = self.defect_specie
                 
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
                 self.Grid_states[x-2,y+j-3] = self.defect_specie

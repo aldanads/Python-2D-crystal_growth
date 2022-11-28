@@ -26,7 +26,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     ---------------------------------------------------------------------------
     """
     
-    tmax = 0
+    time = 0
     pair_atom_defect = distribution_parameters[3]
 
 
