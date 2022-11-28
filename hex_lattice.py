@@ -89,6 +89,9 @@ class Hexagonal_lattice():
                     # Transform the list of tuples to a tuple with two lists
                     aux = np.asarray(cluster_ij)
                     cluster_ij = ([aux[i][0] for i in np.arange(len(aux))],[aux[i][1] for i in np.arange(len(aux))])
+                
+                #print(cluster_ij)
+
                 plt.scatter(self.xv[cluster_ij[0],cluster_ij[1]],self.yv[cluster_ij[0],cluster_ij[1]], color = self.atom_colors[3],s=5)
 
             if (crystal_orientation == True): # Crystal orientation
@@ -299,7 +302,7 @@ class Hexagonal_lattice():
   
                 self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+1] = self.defect_specie
-                #self.Grid_states[x+1,y+j+1] = 2
+                self.Grid_states[x+1,y+j+1] = self.defect_specie
                 
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
                 self.Grid_states[x-2,y+j-3] = self.defect_specie
@@ -312,7 +315,7 @@ class Hexagonal_lattice():
                 
                 self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+2] = self.defect_specie
-                #self.Grid_states[x+1,y+j+1] = 2
+                self.Grid_states[x+1,y+j+1] = self.defect_specie
 
                 
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
@@ -336,18 +339,18 @@ class Hexagonal_lattice():
         
         return coord_xy_defects
         
-    def introduce_defects_j_row(self,j,prob_defects, Lx=1):
+    def introduce_defects_j_row(self,j,prob_defects):
         
         counter=0
         x_length = len(self.xv)
         #init_x = x_length/2*
         # The defects we are introducing in column j
-        prob_defects=np.random.rand(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
+        defects_j_column=np.random.rand(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
             
         for i in np.arange(x_length):
             if self.Grid_states[i,j] == self.atomic_specie:
                 
-                if prob_defects[counter]:
+                if defects_j_column[counter]:
                     self.Grid_states[i,j] = self.defect_specie
                 
                 counter += 1

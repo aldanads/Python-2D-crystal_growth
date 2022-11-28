@@ -185,6 +185,8 @@ class Defects():
             #    self.allowed_events[7] = 1
             
             
+            
+            
             # Kink nucleation --> Armchair
             # We check if the position (i,j) have any crystal in contact
             # Then we have to check if the position (i,j) follow a zigzag direction in diagonal
@@ -195,6 +197,7 @@ class Defects():
                 """
                 Check if there is a crystal at left up and down
                 """
+                
                 if (j > 1) and (i < length_x) and (Grid_states[i+1,j-2] >= 4): # Left up
                     self.allowed_events[7] = 1
                     if (j > 2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
@@ -207,10 +210,12 @@ class Defects():
                     if (j > 2) and (i > 1) and Grid_states[i-2,j-3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
+                
                     
                 """
                 Check if there is a crystal at right up and down
                 """
+                
                 if (i < length_x) and (j < length_y) and (Grid_states[i+1,j+1] >= 4): # Right up
                     self.allowed_events[7] = 1
                     if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
@@ -222,6 +227,7 @@ class Defects():
                     if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
+                    
             
             
             if ((i>0) and (Grid_states[i-1,j] == 1)) or ((i<length_x) and (Grid_states[i+1,j] == 1)):
@@ -229,9 +235,11 @@ class Defects():
             # 3: Mo (Grid_states) Right Mo --------------------------------------------
             # S
             
+            
                 """
                 Check if there is a crystal at left up and down
                 """
+                
                 if (j>0) and (i < length_x) and (Grid_states[i+1,j-1] >= 4): # Left up
                     self.allowed_events[7] = 1
                     if (j>2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
@@ -244,9 +252,12 @@ class Defects():
                         self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
+                
+                    
                 """
                 Check if there is a crystal at right up and down
                 """
+                
                 if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] >= 4): # Right up
                     self.allowed_events[7] = 1
                     if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
@@ -258,6 +269,10 @@ class Defects():
                     if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
                         self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
+                    
+                
+            
+                
             
     # Migration of atoms at the edge of the crystal
     def migration_edge(self,join_cluster_ij,Grid_states):
@@ -279,7 +294,18 @@ class Defects():
         # That is, the defect in the edge can't jump outside the crystal during the migration process
         # Jump outside the crystal is the detach process
         join_cluster_ij = [x for x in join_cluster_ij if join_cluster_ij.count(x) > 1]
-                
+        
+        
+        """
+        Up and down
+        """
+        if (i>1) and (((i-2,j) in join_cluster_ij) and Grid_states[i-2,j] == atomic_specie): # Down
+            self.allowed_events[9] = 1 
+                   
+        if (i<length_x-1) and (((i+2,j) in join_cluster_ij) and Grid_states[i+2,j] == atomic_specie): # Up
+            self.allowed_events[10] = 1
+            
+            
         
         if ((i>0) and (Grid_states[i-1,j] == 0)) or ((i<length_x) and (Grid_states[i+1,j] == 0)):
         # 0
@@ -287,31 +313,24 @@ class Defects():
         # 0
                 
             self.allowed_events[0] = 2 # Left Mo
-            """
-            Up and down
-            """
-            if (i>1) and ((i-2,j) in join_cluster_ij and Grid_states[i-2,j] == atomic_specie): # Down
-               self.allowed_events[9] = 1 
-               
-            if (i<length_x-1) and ((i+2,j) in join_cluster_ij and Grid_states[i+2,j] == atomic_specie): # Up
-                self.allowed_events[10] = 1
+
                 
             """
             Left up and down
             """
-            if (j>1) and (i<length_x) and ((i+1,j-2) in join_cluster_ij and Grid_states[i+1,j-2] == atomic_specie): # Left up
+            if (j>1) and (i<length_x) and (((i+1,j-2) in join_cluster_ij) and Grid_states[i+1,j-2] == atomic_specie): # Left up
                 self.allowed_events[11] = 1
 
-            if (j>1) and (i>0) and ((i-1,j-2) in join_cluster_ij and Grid_states[i-1,j-2] == atomic_specie): # Left down
+            if (j>1) and (i>0) and (((i-1,j-2) in join_cluster_ij) and Grid_states[i-1,j-2] == atomic_specie): # Left down
                 self.allowed_events[12] = 1
                 
             """
             Right up and down
             """
-            if (i<length_x) and (j<length_y) and ((i+1,j+1) in join_cluster_ij and Grid_states[i+1,j+1] == atomic_specie): # Right up
+            if (i<length_x) and (j<length_y) and (((i+1,j+1) in join_cluster_ij) and Grid_states[i+1,j+1] == atomic_specie): # Right up
                 self.allowed_events[13] = 1
                 
-            if (i>0) and (j<length_y) and ((i-1,j+1) in join_cluster_ij and Grid_states[i-1,j+1] == atomic_specie): # Right down
+            if (i>0) and (j<length_y) and (((i-1,j+1) in join_cluster_ij) and Grid_states[i-1,j+1] == atomic_specie): # Right down
                 self.allowed_events[14] = 1
                 
                 
@@ -323,32 +342,23 @@ class Defects():
         
             self.allowed_events[0] = 3 # Right Mo
             
-            """
-            Up and down
-            """
             
-            if (i>1) and ((i-2,j) in join_cluster_ij and Grid_states[i-2,j] == atomic_specie): # Down
-               self.allowed_events[9] = 1 
-               
-            if (i<length_x-1) and ((i+2,j) in join_cluster_ij and Grid_states[i+2,j] == atomic_specie): # Up
-                self.allowed_events[10] = 1
-
             """
             Left up and down
             """
-            if (j>0) and (i<length_x) and ((i+1,j-1) in join_cluster_ij and Grid_states[i+1,j-1] == atomic_specie): # Left up
+            if (j>0) and (i<length_x) and (((i+1,j-1) in join_cluster_ij) and Grid_states[i+1,j-1] == atomic_specie): # Left up
                 self.allowed_events[11] = 1
             
-            if (j>0) and (i>0) and ((i-1,j-1) in join_cluster_ij and Grid_states[i-1,j-1] == atomic_specie): # Left down
+            if (j>0) and (i>0) and (((i-1,j-1) in join_cluster_ij) and Grid_states[i-1,j-1] == atomic_specie): # Left down
                 self.allowed_events[12] = 1
                 
             """
             Right up and down
             """
-            if (i<length_x) and (j<length_y-1) and ((i+1,j+2) in join_cluster_ij and Grid_states[i+1,j+2] == atomic_specie): # Right up
+            if (i<length_x) and (j<length_y-1) and (((i+1,j+2) in join_cluster_ij) and Grid_states[i+1,j+2] == atomic_specie): # Right up
                 self.allowed_events[13] = 1
                     
-            if (i>0) and (j<length_y-1) and ((i-1,j+2) in join_cluster_ij and Grid_states[i-1,j+2] == atomic_specie): # Right down
+            if (i>0) and (j<length_y-1) and (((i-1,j+2) in join_cluster_ij) and Grid_states[i-1,j+2] == atomic_specie): # Right down
                 self.allowed_events[14] = 1
         
         
@@ -499,10 +509,11 @@ class Cluster():
         
     def __init__(self,Grid_states):
             
-        cluster_ij = np.where(Grid_states == 4)
+        #Calculate the crystal coordinates
+        cluster_ij = np.where(Grid_states >= 4) # Coordinates of the full crystal
         cluster_ij = [(cluster_ij[0][i],cluster_ij[1][i]) for i in np.arange(len(cluster_ij[0]))]
+        self.cluster_ij = cluster_ij # List of tuples with the coordinates of the crystal
 
-        self.cluster_ij = cluster_ij # List of tuples
         self.cluster_size = sum(sum(Grid_states == 4)) + sum(sum(Grid_states == 5))
         self.Mo_sites = sum(sum(Grid_states > 1))
         self.coverage = self.cluster_size / self.Mo_sites
@@ -511,7 +522,14 @@ class Cluster():
         # joining to the cluster
         self.join_cluster_ij = []   
         
+        # Calculate the region where adatoms can join the crystal
         self.clustering_region(Grid_states,cluster_ij)
+
+        edge_ij = np.where(self.Grid_states == 4) # Coordinates of the edge
+        edge_ij = [(edge_ij[0][i],edge_ij[1][i]) for i in np.arange(len(edge_ij[0]))] # Convert to tuples
+        self.edge_ij = edge_ij # List of tuples with the coordinates of the edge
+
+
             
         
     # Search for the region where the adatom can join the growing crystal
@@ -651,20 +669,23 @@ class Cluster():
             self.cluster_ij.append(new_defect_ij) # New defect incorporate to the crystal
             
             self.clustering_region(Grid_states,[new_defect_ij]) # Check new joining sites
-            #join_cluster_ij = self.join_cluster_ij   
+            if self.Grid_states[mig_defect] == 4: self.edge_ij.append(mig_defect) #Update the edge
             self.cluster_size += 1
             self.coverage = self.cluster_size / self.Mo_sites # The coverage of the layer by the crystal          
-            # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 
+            # Remove elements of join_cluster_ij that already belongs to the cluster (edge_ij) 
             self.join_cluster_ij = [x for x in self.cluster_ij+self.join_cluster_ij if x not in self.cluster_ij]
        
 
         elif (s+1 > 8): # Migration of atoms at the crystal edge
-        
             self.cluster_ij.remove(new_defect_ij) # This atoms changed his position
             self.cluster_ij.append(mig_defect) # New position of the atom
+
             self.join_cluster_ij = [] # There are no valid elements. We recalculate the region
             self.clustering_region(Grid_states,self.cluster_ij) # Check new joining sites
-            # Remove elements of join_cluster_ij that already belongs to the cluster (cluster_ij) 
+            self.edge_ij.remove(new_defect_ij)
+            if self.Grid_states[mig_defect] == 4: self.edge_ij.append(mig_defect) # Update the edge
+
+            # Remove elements of join_cluster_ij that already belongs to the cluster (edge_ij) 
             self.join_cluster_ij = [x for x in self.cluster_ij+self.join_cluster_ij if x not in self.cluster_ij]
    
         # We update the Grid_states with inner points of the cluster (Grid_states = 5)

@@ -16,7 +16,7 @@ import os
 
 
 
-def initialization(E_nuc_prop,n_sim,save_data):
+def initialization(parameters,n_sim,save_data):
 
     # Random seed as time
     random.seed(datetime.now())
@@ -26,7 +26,7 @@ def initialization(E_nuc_prop,n_sim,save_data):
     
     if save_data:
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py']
-        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles\Zigzag_armchair\\'
+        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles\Low adsortion rate\\'
         dst_data = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
         dst_data = ''
@@ -38,7 +38,7 @@ def initialization(E_nuc_prop,n_sim,save_data):
     """ 
     a=0.639 # nm
     b=0.639 # nm
-    device_size = (5, 5) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+    device_size = (50, 50) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
     atom_colors=['orange','purple','blue', 'black'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
     # Activation energies --> Adatoms
@@ -47,8 +47,8 @@ def initialization(E_nuc_prop,n_sim,save_data):
 
     #E_nucleation = 1.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
     #E_propagation = 1.5 # Kink propagation (1.4 eV) --> Growing in zigzag direction
-    E_nucleation = E_nuc_prop[0][n_sim]
-    E_propagation = E_nuc_prop[1][n_sim]
+    E_nucleation = parameters[0]
+    E_propagation = parameters[1]
     E_desorption = 1.52
     # Activation energies --> Atoms at the crystal edge
     E_mig_armchair_edge = 3 # Armchair direction
@@ -93,7 +93,7 @@ def initialization(E_nuc_prop,n_sim,save_data):
     
     #prob_defects = adsortion_rate[n_sim]
     #prob_defects = 0.001
-    prob_defects = 0.001
+    prob_defects = parameters[2][n_sim]
     crystal_orientation = True
     pair_atom_defect=(3,4)
     MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[4],pair_atom_defect)
