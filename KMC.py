@@ -8,7 +8,7 @@ import numpy as np
 from defects import*
 
 
-def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events):
+def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     
     Grid_states = MoS2_lattice.Grid_states # 
     T = MoS2_lattice.T # Crystal temperature 
@@ -37,7 +37,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events):
         prob_defects = distribution_parameters[4]
   
 
-        MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution,pair_atom_defect)
+        MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution,pair_atom_defect,rng)
 
 
     for i in np.arange(len(xy_adatom_edge)):
@@ -49,45 +49,51 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events):
         """
         ------------- Select event with kinetic Monte Carlo technique ------
         """
-        sum_TR = sum(TR)*np.random.rand()
+        sum_TR = sum(TR)*rng.random()
+        
+
         
         if sum_TR == 0: continue
-        Pointer_event = TR[0]
+        pointer_event = TR[0]
         s = 0
 
-        while (Pointer_event < sum_TR):
+        while (pointer_event < sum_TR):
             s += 1
-            Pointer_event += TR[s]
+            pointer_event += TR[s]
 
 
         #Calculate the time
-        time =  -np.log(np.random.rand())/sum_TR
-        if time > tmax:
-            tmax=time
+        time =  -np.log(rng.random())/sum(TR)
+        #if time > tmax:
+        #    tmax=time
             
         # The probability of an event happening at a specific time
-        event_prob=1.0-np.exp(-TR[s]*tmax);
+        event_prob=1.0-np.exp(-TR[s]*time);
+        
 
         """
         --------------------------------------------------------------------
         """
         events[0][1:] += Mo_adatom.allowed_events[1:]
         
-        if np.random.rand() < event_prob:
+        if rng.random() < event_prob:
+            
+
             # Update the Grid with the chosen events
             Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) 
             events[1][s+1] += 1
             events[1][0] += 1
 
+
             if (s+1 >= 7): # Update the crystal -> New adatom joined
                 Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),s,(Mo_adatom.i,Mo_adatom.j))
-            #if (s >= 8):
-                #print(TR[8:],s)
+     
+                
         #MoS2_lattice.plot_lattice()
         
         
         
     MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
-    MoS2_lattice.add_time(tmax)
+    MoS2_lattice.add_time(time)
     return MoS2_lattice,MoS2_crystal,Mo_adatom,events
 

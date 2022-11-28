@@ -19,7 +19,8 @@ import os
 def initialization(parameters,n_sim,save_data):
 
     # Random seed as time
-    random.seed(datetime.now())
+    #random.seed(datetime.now())
+    rng = np.random.default_rng() # Random Number Generator (RNG) object
 
     # Default resolution for figures
     plt.rcParams["figure.dpi"] = 300 # Default value of dpi = 300
@@ -49,7 +50,8 @@ def initialization(parameters,n_sim,save_data):
     #E_propagation = 1.5 # Kink propagation (1.4 eV) --> Growing in zigzag direction
     E_nucleation = parameters[0]
     E_propagation = parameters[1]
-    E_desorption = 1.52
+    #E_desorption = 1.52
+    E_desorption = 1.3
     # Activation energies --> Atoms at the crystal edge
     E_mig_armchair_edge = 3 # Armchair direction
     E_mig_zigzag_edge = 3 # Zigzag direction
@@ -96,9 +98,9 @@ def initialization(parameters,n_sim,save_data):
     prob_defects = parameters[2][n_sim]
     crystal_orientation = True
     pair_atom_defect=(3,4)
-    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[4],pair_atom_defect)
+    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[4],pair_atom_defect,rng)
     pair_atom_defect = (atomic_specie,defect_specie)
-    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect)
+    #MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect,rng)
     
     distribution_parameters = [distribution[0],skewness,fissure_region,pair_atom_defect,prob_defects]
 
@@ -107,7 +109,7 @@ def initialization(parameters,n_sim,save_data):
     
     MoS2_lattice.plot_lattice(crystal_orientation,'',0,0,True) # Initial state of the grid
     
-    return MoS2_lattice,MoS2_crystal,distribution_parameters, dst_data
+    return MoS2_lattice,MoS2_crystal,distribution_parameters, dst_data,rng
 
 def save_simulation(files_copy,dst,n_sim):
     

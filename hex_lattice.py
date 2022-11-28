@@ -120,19 +120,19 @@ class Hexagonal_lattice():
         -------------------- Introducing defects in the crystal ---------------
         """
         
-    def defect_distributions(self,prob_defects,fissure_region,skewness,distribution,pair_atom_defect):
+    def defect_distributions(self,prob_defects,fissure_region,skewness,distribution,pair_atom_defect,rng):
             
         self.atomic_specie = pair_atom_defect[0]
         self.defect_specie = pair_atom_defect[1]
             
         if distribution == 'uniform':
-            self.defects_row(prob_defects,fissure_region)
+            self.defects_row(prob_defects,fissure_region,rng)
         if distribution == 'triangle':
-            self.defect_triangle(prob_defects,fissure_region)
+            self.defect_triangle(prob_defects,fissure_region,rng)
         if distribution == 'skewed_gaussian':
-            self.defects_skewed_gaussian(prob_defects,fissure_region,skewness)
+            self.defects_skewed_gaussian(prob_defects,fissure_region,skewness,rng)
         if distribution == 'test 1: single adatom':
-            self.single_defect()
+            self.single_defect(rng)
         if distribution == 'Crystal seed':
             self.crystal_seed()
             
@@ -150,7 +150,7 @@ class Hexagonal_lattice():
         
 
     # Uniform distribution
-    def defects_row(self,prob_defects,fissure_region):
+    def defects_row(self,prob_defects,fissure_region,rng):
         
         
         # 1 position is sulfur and the other is Molybdenum --> there is len(xv)/2 sulfur in a column
@@ -179,10 +179,10 @@ class Hexagonal_lattice():
         
         for j in np.arange(start_row,finish_row):
             
-            self.introduce_defects_j_row(j,prob_defects)
+            self.introduce_defects_j_row(j,prob_defects,rng)
         
     # Triangle distribution of defects
-    def defect_triangle(self,prob_defects,fissure_region):
+    def defect_triangle(self,prob_defects,fissure_region,rng):
                     
         a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
              
@@ -206,13 +206,13 @@ class Hexagonal_lattice():
             dose=slope*(start_triangle-j)+b;
             list_prob[j] = dose
 
-            self.introduce_defects_j_row(j,prob_defects)
+            self.introduce_defects_j_row(j,prob_defects,rng)
             
         self.list_prob = list_prob
 
     # Skewed Gaussian distribution:
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.skewnorm.html
-    def defects_skewed_gaussian(self,prob_defects,fissure_region,skewness):
+    def defects_skewed_gaussian(self,prob_defects,fissure_region,skewness,rng):
 
         a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
         
@@ -241,12 +241,12 @@ class Hexagonal_lattice():
             
             list_prob.append(prob)
 
-            self.introduce_defects_j_row(j,prob_defects)
+            self.introduce_defects_j_row(j,prob_defects,rng)
             
         self.list_prob = list_prob
         
             
-    def single_defect(self):
+    def single_defect(self,rng):
 
         j = 0
         length_xv = len(self.xv)
@@ -256,11 +256,18 @@ class Hexagonal_lattice():
 
         if self.Grid_states[x,y] == self.atomic_specie:
             self.Grid_states[x,y] = self.defect_specie
+            self.introduce_defects_j_row(y+j,1,rng)
+            self.introduce_defects_j_row(y+j-1,1,rng)
+            self.Grid_states[x,y+j-3] = 4
+
         else:
             while self.Grid_states[x,y+j] != self.atomic_specie:
                 j += 1
                 
-            self.Grid_states[x,y+j] = self.defect_specie 
+            #self.Grid_states[x,y+j] = self.defect_specie 
+            self.introduce_defects_j_row(y+j,1,rng)
+            self.introduce_defects_j_row(y+j+1,1,rng)
+            self.Grid_states[x-1,y+j-2] = 4
 
 
     def crystal_seed(self):
@@ -339,13 +346,13 @@ class Hexagonal_lattice():
         
         return coord_xy_defects
         
-    def introduce_defects_j_row(self,j,prob_defects):
+    def introduce_defects_j_row(self,j,prob_defects,rng):
         
         counter=0
         x_length = len(self.xv)
         #init_x = x_length/2*
         # The defects we are introducing in column j
-        defects_j_column=np.random.rand(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
+        defects_j_column= rng.random(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
             
         for i in np.arange(x_length):
             if self.Grid_states[i,j] == self.atomic_specie:

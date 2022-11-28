@@ -10,22 +10,22 @@ import shutil
 
 save_data = False
 
-adsortion_rate = [0.001,0.0008,0.0006,0.0004,0.0002,0.0004]
-E_nucleation = 1.7
-E_propagation = 1.4
+adsortion_rate = [0.001,0.0008,0.0006,0.0004,0.0002,0.00001]
+E_nucleation = 1.6
+E_propagation = 1.3
 
 parameters = [E_nucleation,E_propagation,adsortion_rate]
 
-for n_sim in np.arange(5,len(adsortion_rate)):
+for n_sim in np.arange(4,len(adsortion_rate)):
 
-    MoS2_lattice, MoS2_crystal,distribution_parameters,dst_data = initialization(parameters,n_sim,save_data)
+    MoS2_lattice, MoS2_crystal,distribution_parameters,dst_data,rng = initialization(parameters,n_sim,save_data)
     events = [np.zeros(15),np.zeros(15)]
     
     i = 0
     j = 0
     while MoS2_crystal.coverage < 0.25:
         i += 1
-        MoS2_lattice, MoS2_crystal,Mo_adatom,events = KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events)
+        MoS2_lattice, MoS2_crystal,Mo_adatom,events = KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng)
 
         if i%100 == 0:
             j += 1
