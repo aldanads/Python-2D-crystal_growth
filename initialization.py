@@ -27,7 +27,7 @@ def initialization(parameters,n_sim,save_data):
     
     if save_data:
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py']
-        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\\'
+        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsorption rate\\'
         dst_data = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
         dst_data = ''
@@ -52,14 +52,22 @@ def initialization(parameters,n_sim,save_data):
     E_propagation = parameters[1]
     #E_desorption = 1.52
     E_desorption = 1.3
-    # Activation energies --> Atoms at the crystal edge
-    E_mig_armchair_edge = 3 # Armchair direction
-    E_mig_zigzag_edge = 3 # Zigzag direction
+    
+# =============================================================================
+#     # Edge diffusion comparable to the attachment barrier
+#     # Edge diffusion = 1.84 eV
+#     Li, Xiaying, Shiping Zhang, Shuai Chen, Xingli Zhang, Junfeng Gao, Yong-Wei Zhang, Jijun Zhao et al. 
+#     "Mo concentration controls the morphological transitions from dendritic to semicompact, and to compact growth of monolayer crystalline MoS2 on various substrates." 
+#     ACS applied materials & interfaces 11, no. 45 (2019): 42751-42759.
+# =============================================================================
+
+    E_mig_armchair_edge = 1.84 # Armchair direction
+    E_mig_zigzag_edge = 1.84 # Zigzag direction
     
     Backup_energy = [E_mig_zigzag,E_mig_armchair,E_nucleation,E_propagation,E_desorption,E_mig_zigzag_edge,E_mig_armchair_edge]
     
     # Temperature
-    T = 1273
+    T = 1108
     # T = 835 Celsius in exp
     # time for growing: 5 min
     
@@ -84,7 +92,7 @@ def initialization(parameters,n_sim,save_data):
         'triangle' --> Right triangle distribution of defects
         'test 1: single adatom' --> Single adatom in the middle of the grid
     """
-    distribution = ['uniform','skewed_gaussian','triangle','test 1: single adatom','Crystal seed']
+    distribution = ['uniform','skewed_gaussian','triangle','test 1: single adatom','test 2: column defect','Crystal seed']
     # skewness parameter --> a=0 is the normal distribution
     skewness = 12 # Skewness of the skewed Gaussian distribution
     fissure_region = (round(len(xv[0])/2)+2,100) # [0] middle point and [1] half width (nm)
@@ -98,7 +106,7 @@ def initialization(parameters,n_sim,save_data):
     prob_defects = parameters[2][n_sim]
     crystal_orientation = True
     pair_atom_defect=(3,4)
-    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[4],pair_atom_defect,rng)
+    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[5],pair_atom_defect,rng)
     pair_atom_defect = (atomic_specie,defect_specie)
     #MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect,rng)
     

@@ -690,4 +690,10 @@ class Cluster():
    
         # We update the Grid_states with inner points of the cluster (Grid_states = 5)
         return self.Grid_states
+    
+    def crystal_area(self):
         
+        cluster_ij = self.cluster_ij
+        
+        
+       

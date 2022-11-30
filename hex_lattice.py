@@ -133,6 +133,8 @@ class Hexagonal_lattice():
             self.defects_skewed_gaussian(prob_defects,fissure_region,skewness,rng)
         if distribution == 'test 1: single adatom':
             self.single_defect(rng)
+        if distribution == 'test 2: column defect':
+            self.column_defect(rng)
         if distribution == 'Crystal seed':
             self.crystal_seed()
             
@@ -176,10 +178,14 @@ class Hexagonal_lattice():
         list_prob[start_row:finish_row] = prob_defects
         
         self.list_prob = list_prob
+        self.adatom_flux = 0
         
         for j in np.arange(start_row,finish_row):
             
             self.introduce_defects_j_row(j,prob_defects,rng)
+            
+        # adatom flux --> adatoms adsorted by the substrate (adatoms / nm^2)
+        self.adatom_flux = self.adatom_flux / (self.x_axis * self.y_axis)
         
     # Triangle distribution of defects
     def defect_triangle(self,prob_defects,fissure_region,rng):
@@ -256,6 +262,24 @@ class Hexagonal_lattice():
 
         if self.Grid_states[x,y] == self.atomic_specie:
             self.Grid_states[x,y] = self.defect_specie
+
+        else:
+            while self.Grid_states[x,y+j] != self.atomic_specie:
+                j += 1
+                
+            self.Grid_states[x,y+j] = self.defect_specie 
+
+            
+    def column_defect(self,rng):
+        
+        j = 0
+        length_xv = len(self.xv)
+        length_yv = len(self.yv[0])
+        x = int(length_xv/2)
+        y = int(length_yv/2)
+
+        if self.Grid_states[x,y] == self.atomic_specie:
+            self.Grid_states[x,y] = self.defect_specie
             self.introduce_defects_j_row(y+j,1,rng)
             self.introduce_defects_j_row(y+j-1,1,rng)
             self.Grid_states[x,y+j-3] = 4
@@ -268,7 +292,6 @@ class Hexagonal_lattice():
             self.introduce_defects_j_row(y+j,1,rng)
             self.introduce_defects_j_row(y+j+1,1,rng)
             self.Grid_states[x-1,y+j-2] = 4
-
 
     def crystal_seed(self):
         j = 0
@@ -341,7 +364,6 @@ class Hexagonal_lattice():
         self.n_defects = n_defects
         # Transform the coordinate in a list of tuples --> Easier to compare with other tuples
         coord_xy_defects = [(coord_xy_defects[0][i],coord_xy_defects[1][i]) for i in np.arange(len(coord_xy_defects[0]))]
-        #self.coord_xy_defects = coord_xy_defects
         
         return coord_xy_defects
         
@@ -351,8 +373,9 @@ class Hexagonal_lattice():
         x_length = len(self.xv)
         #init_x = x_length/2*
         # The defects we are introducing in column j
-        defects_j_column= rng.random(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
-            
+        defects_j_column = rng.random(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
+        self.adatom_flux += sum(defects_j_column)
+        
         for i in np.arange(x_length):
             if self.Grid_states[i,j] == self.atomic_specie:
                 

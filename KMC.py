@@ -26,7 +26,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     ---------------------------------------------------------------------------
     """
     
-    time = 0
+    tmax = 0
     pair_atom_defect = distribution_parameters[3]
 
 
@@ -64,11 +64,11 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
 
         #Calculate the time
         time =  -np.log(rng.random())/sum(TR)
-        #if time > tmax:
-        #    tmax=time
+        if time > tmax:
+            tmax=time
             
         # The probability of an event happening at a specific time
-        event_prob=1.0-np.exp(-TR[s]*time);
+        event_prob=1.0-np.exp(-TR[s]*tmax);
         
 
         """
@@ -94,6 +94,6 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
         
         
     MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
-    MoS2_lattice.add_time(time)
+    MoS2_lattice.add_time(tmax)
     return MoS2_lattice,MoS2_crystal,Mo_adatom,events
 
