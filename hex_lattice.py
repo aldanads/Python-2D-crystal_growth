@@ -120,21 +120,39 @@ class Hexagonal_lattice():
         -------------------- Introducing defects in the crystal ---------------
         """
         
-    def defect_distributions(self,prob_defects,fissure_region,skewness,distribution,pair_atom_defect,rng):
+    def defect_distributions(self,distribution_parameters):
             
+        distribution = distribution_parameters[0]
+        pair_atom_defect = distribution_parameters[3]
+        rng = distribution_parameters[6]
+
+        
         self.atomic_specie = pair_atom_defect[0]
         self.defect_specie = pair_atom_defect[1]
             
         if distribution == 'uniform':
-            self.defects_row(prob_defects,fissure_region,rng)
+            fissure_region = distribution_parameters[2] 
+            prob_defects = distribution_parameters[4]
+            split_regions = distribution_parameters[5]
+            self.defects_row(prob_defects,fissure_region,rng,split_regions)
+            
         if distribution == 'triangle':
+            fissure_region = distribution_parameters[2] 
+            prob_defects = distribution_parameters[4]
             self.defect_triangle(prob_defects,fissure_region,rng)
+            
         if distribution == 'skewed_gaussian':
+            fissure_region = distribution_parameters[2] 
+            skewness = distribution_parameters[1] 
+            prob_defects = distribution_parameters[4]
             self.defects_skewed_gaussian(prob_defects,fissure_region,skewness,rng)
+            
         if distribution == 'test 1: single adatom':
             self.single_defect(rng)
+            
         if distribution == 'test 2: column defect':
             self.column_defect(rng)
+            
         if distribution == 'Crystal seed':
             self.crystal_seed()
             
@@ -152,7 +170,7 @@ class Hexagonal_lattice():
         
 
     # Uniform distribution
-    def defects_row(self,prob_defects,fissure_region,rng):
+    def defects_row(self,prob_defects,fissure_region,rng,split_regions):
         
         
         # 1 position is sulfur and the other is Molybdenum --> there is len(xv)/2 sulfur in a column
@@ -164,25 +182,34 @@ class Hexagonal_lattice():
         width_fissure = fissure_region[1]*2/a # half width of fissure region in columns
         
         length_xv = len(self.xv[0])
-        # If the fissure region is greater than the simulation domain, we cover the simulation domain
-        if 2 * width_fissure > length_xv:
-            start_row = 0
-            finish_row = length_xv
-        else: # The fissure region fit the simulation domain
-            # The triangle starting point in the grid
-            start_row = round(irradiated_row - width_fissure)
-            # The last point of the triangle in the grid
-            finish_row = round(irradiated_row + width_fissure)
-            
         list_prob = np.zeros(length_xv)
-        list_prob[start_row:finish_row] = prob_defects
+
+        if split_regions['Boundary'] == 'None': # Only one region
+            # If the fissure region is greater than the simulation domain, we cover the simulation domain
+            if 2 * width_fissure > length_xv:
+                start_row = 0
+                finish_row = length_xv
+            else: # The fissure region fit the simulation domain
+                # The triangle starting point in the grid
+                start_row = round(irradiated_row - width_fissure)
+                # The last point of the triangle in the grid
+                finish_row = round(irradiated_row + width_fissure)
+                
+                list_prob[start_row:finish_row] = prob_defects
+                
+        elif split_regions['Boundary'] == 'vertical': # Two regions splitted by a vertical boundary
+            start_row = 0
+            finish_row = length_xv    
+            list_prob[0:split_regions['Position']] = prob_defects
+            list_prob[split_regions['Position']:] = split_regions['ad_rate']
+
         
         self.list_prob = list_prob
         self.adatom_flux = 0
         
         for j in np.arange(start_row,finish_row):
             
-            self.introduce_defects_j_row(j,prob_defects,rng)
+            self.introduce_defects_j_row(j,list_prob[j],rng)
             
         # adatom flux --> adatoms adsorted by the substrate (adatoms / nm^2)
         self.adatom_flux = self.adatom_flux / (self.x_axis * self.y_axis)

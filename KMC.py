@@ -28,16 +28,8 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     
     tmax = 0
     pair_atom_defect = distribution_parameters[3]
-
-
-    if MoS2_lattice.n_defects < 10000:
-        distribution = distribution_parameters[0]
-        skewness = distribution_parameters[1] 
-        fissure_region = distribution_parameters[2] 
-        prob_defects = distribution_parameters[4]
-  
-
-        MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution,pair_atom_defect,rng)
+    
+    MoS2_lattice.defect_distributions(distribution_parameters)
 
 
     for i in np.arange(len(xy_adatom_edge)):

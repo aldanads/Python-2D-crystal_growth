@@ -29,7 +29,7 @@ def initialization(parameters,n_sim,save_data):
         dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsorption rate\\'
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
-        paths = ''
+        paths = {'data': ''}
         
     
     """ --------------------------------------------------------------------------
@@ -100,16 +100,20 @@ def initialization(parameters,n_sim,save_data):
     # Type of defects in the lattice
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     
-    #prob_defects = adsortion_rate[n_sim]
-    #prob_defects = 0.001
+    # 2 regions: etched and non-etched region
+    # Boundary: 'vertical', 'horizontal', 'none'
+    # Position: int - the row/column acting as a boundary and separe one region from the other
+    split_regions = {'Boundary' : 'vertical', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[2][n_sim] + 0.0004}
+    
+
     prob_defects = parameters[2][n_sim]
     crystal_orientation = True
-    pair_atom_defect=(3,4)
-    MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[5],pair_atom_defect,rng)
-    pair_atom_defect = (atomic_specie,defect_specie)
-    #MoS2_lattice.defect_distributions(prob_defects,fissure_region,skewness,distribution[0],pair_atom_defect,rng)
+    pair_atom_defect=(3,4) # Introduce the crystal seed
+    distribution_parameters = [distribution[5],skewness,fissure_region,pair_atom_defect,prob_defects,split_regions,rng]
+    MoS2_lattice.defect_distributions(distribution_parameters)
     
-    distribution_parameters = [distribution[0],skewness,fissure_region,pair_atom_defect,prob_defects]
+    pair_atom_defect = (atomic_specie,defect_specie)
+    distribution_parameters = [distribution[0],skewness,fissure_region,pair_atom_defect,prob_defects,split_regions,rng]
 
     
     MoS2_crystal = Cluster(MoS2_lattice.Grid_states) # Crystal seed
