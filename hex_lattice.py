@@ -77,11 +77,15 @@ class Hexagonal_lattice():
                 
             if split_regions != False:
                 
+                split_line = split_regions['Position'] # The boundary position
                 if split_regions['Boundary'] == 'vertical':
-                    split_line = split_regions['Position']
                     y = [self.yv[len(self.yv)-1,0]] * (len(self.yv)-split_line) # max value of y
                     # x go from the split line until the end
                     plt.fill_between(self.xv[0,split_line:],y,alpha = 0.2)
+                elif split_regions['Boundary'] == 'horizontal':
+                    x = [self.xv[0,len(self.xv)-1]] * (len(self.xv)-split_line) # max value of x
+                    # y go from the split line until the end
+                    plt.fill_betweenx(self.yv[split_line:,0],x,alpha = 0.2)
                 
             
             if (type(self.Grid_states) == np.ndarray):
@@ -191,6 +195,7 @@ class Hexagonal_lattice():
         width_fissure = fissure_region[1]*2/a # half width of fissure region in columns
         
         length_xv = len(self.xv[0])
+        self.adatom_flux = 0
         list_prob = np.zeros(length_xv)
 
         if split_regions['Boundary'] == 'None': # Only one region
@@ -205,20 +210,33 @@ class Hexagonal_lattice():
                 finish_row = round(irradiated_row + width_fissure)
                 
                 list_prob[start_row:finish_row] = prob_defects
+            
+            for j in np.arange(start_row,finish_row):
+                
+                self.introduce_defects_j_row(j,list_prob[j],rng)
                 
         elif split_regions['Boundary'] == 'vertical': # Two regions splitted by a vertical boundary
             start_row = 0
             finish_row = length_xv    
             list_prob[0:split_regions['Position']] = prob_defects
             list_prob[split_regions['Position']:] = split_regions['ad_rate']
+            
+            for j in np.arange(start_row,finish_row):
+                
+                self.introduce_defects_j_row(j,list_prob[j],rng)
+            
+        elif split_regions['Boundary'] == 'horizontal': # Two regions splitted by a horizontal boundary
+            start_row = 0
+            finish_row = length_xv  
+            
+            for j in np.arange(start_row,finish_row):
+                
+                self.introduce_defects_j_row(j,prob_defects,rng,split_regions)
 
         
         self.list_prob = list_prob
-        self.adatom_flux = 0
         
-        for j in np.arange(start_row,finish_row):
-            
-            self.introduce_defects_j_row(j,list_prob[j],rng)
+
             
         # adatom flux --> adatoms adsorted by the substrate (adatoms / nm^2)
         self.adatom_flux = self.adatom_flux / (self.x_axis * self.y_axis)
@@ -403,13 +421,20 @@ class Hexagonal_lattice():
         
         return coord_xy_defects
         
-    def introduce_defects_j_row(self,j,prob_defects,rng):
+    def introduce_defects_j_row(self,j,prob_defects,rng, split_regions = False):
         
         counter=0
         x_length = len(self.xv)
         #init_x = x_length/2*
         # The defects we are introducing in column j
-        defects_j_column = rng.random(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
+        if split_regions == False:
+            defects_j_column = rng.random(sum(self.Grid_states[:,j] == self.atomic_specie)) < prob_defects
+        elif split_regions['Boundary'] == 'horizontal':  
+            # Two lists: Before the split line and after the split line
+            defects_j_column = list(rng.random(sum(self.Grid_states[:split_regions['Position'],j] == self.atomic_specie)) < prob_defects) 
+            defects_j_column_aux = list(rng.random(sum(self.Grid_states[split_regions['Position']:,j] == self.atomic_specie)) < split_regions['ad_rate'])
+            defects_j_column += defects_j_column_aux
+            
         self.adatom_flux += sum(defects_j_column)
         
         for i in np.arange(x_length):

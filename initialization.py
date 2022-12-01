@@ -41,14 +41,14 @@ def initialization(parameters,n_sim,save_data):
     device_size = (50, 50) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
     atom_colors=['orange','purple','blue', 'black'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
-    # Activation energies --> Adatoms
+# =============================================================================
+#     # Activation energies 
+# =============================================================================
     E_mig_zigzag = 1.2 # Zigzag direction
     E_mig_armchair = 1.2 # Armchair direction
 
-    #E_nucleation = 1.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
-    #E_propagation = 1.5 # Kink propagation (1.4 eV) --> Growing in zigzag direction
-    E_nucleation = parameters[0]
-    E_propagation = parameters[1]
+    E_nucleation = 1.6 # Kink nucleation (1.7 eV) --> Growing in armchair direction
+    E_propagation = 1.3 # Kink propagation (1.4 eV) --> Growing in zigzag direction
     #E_desorption = 1.52
     E_desorption = 1.3
     
@@ -85,11 +85,13 @@ def initialization(parameters,n_sim,save_data):
     MoS2_lattice = Hexagonal_lattice(a,b,device_size,atom_colors,Backup_energy,T)
     xv=MoS2_lattice.xv
     """
-    distribution:
-        'uniform' --> Uniform rows
-        'skewed_gaussian' --> Skewed Gaussian distribution of defects
-        'triangle' --> Right triangle distribution of defects
-        'test 1: single adatom' --> Single adatom in the middle of the grid
+# =============================================================================
+#     distribution:
+#         'uniform' --> Uniform rows
+#         'skewed_gaussian' --> Skewed Gaussian distribution of defects
+#         'triangle' --> Right triangle distribution of defects
+#         'test 1: single adatom' --> Single adatom in the middle of the grid
+# =============================================================================
     """
     distribution = ['uniform','skewed_gaussian','triangle','test 1: single adatom','test 2: column defect','Crystal seed']
     # skewness parameter --> a=0 is the normal distribution
@@ -103,10 +105,10 @@ def initialization(parameters,n_sim,save_data):
     # 2 regions: etched and non-etched region
     # Boundary: 'vertical', 'horizontal', 'none'
     # Position: int - the row/column acting as a boundary and separe one region from the other
-    split_regions = {'Boundary' : 'vertical', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[2][n_sim] + 0.0002}
+    split_regions = {'Boundary' : 'horizontal', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[n_sim] + 0.0002}
     
 
-    prob_defects = parameters[2][n_sim]
+    prob_defects = parameters[n_sim]
     crystal_orientation = True
     pair_atom_defect=(3,4) # Introduce the crystal seed
     distribution_parameters = [distribution[5],skewness,fissure_region,pair_atom_defect,prob_defects,split_regions,rng]

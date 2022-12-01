@@ -13,12 +13,10 @@ save_var = False
 
 
 adsortion_rate = [0.00005,0.0001,0.00015,0.0002,0.0004, 0.0006, 0.0008, 0.001, 0.002]
-E_nucleation = 1.6
-E_propagation = 1.3
 
 
 
-parameters = [E_nucleation,E_propagation,adsortion_rate]
+parameters = adsortion_rate
 
 for n_sim in np.arange(3,len(adsortion_rate)):
 
