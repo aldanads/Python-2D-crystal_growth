@@ -103,7 +103,7 @@ def initialization(parameters,n_sim,save_data):
     # 2 regions: etched and non-etched region
     # Boundary: 'vertical', 'horizontal', 'none'
     # Position: int - the row/column acting as a boundary and separe one region from the other
-    split_regions = {'Boundary' : 'vertical', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[2][n_sim] + 0.0004}
+    split_regions = {'Boundary' : 'vertical', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[2][n_sim] + 0.0002}
     
 
     prob_defects = parameters[2][n_sim]

@@ -63,7 +63,7 @@ class Hexagonal_lattice():
             
         
     
-    def plot_lattice(self,crystal_orientation = False, path = '',t=0,i=0, grid=False,cluster_ij = False):
+    def plot_lattice(self,crystal_orientation = False, path = '',t=0,i=0, grid=False,cluster_ij = False,split_regions = False):
         
         # Sulfur atomic radius: 100 pm
         # Moldibdenum atomic radius: 139 pm
@@ -74,6 +74,15 @@ class Hexagonal_lattice():
                 plt.scatter(self.xv[0::2,1::3],self.yv[0::2,1::3],color = self.atom_colors[0],s=1) # Sulfur
                 plt.scatter(self.xv[0::2,0::3],self.yv[0::2,0::3],color = self.atom_colors[1],s=1.39) # Molibdenum
                 plt.scatter(self.xv[1::2,2::3],self.yv[1::2,2::3],color = self.atom_colors[1],s=1.39) # Molibdenum
+                
+            if split_regions != False:
+                
+                if split_regions['Boundary'] == 'vertical':
+                    split_line = split_regions['Position']
+                    y = [self.yv[len(self.yv)-1,0]] * (len(self.yv)-split_line) # max value of y
+                    # x go from the split line until the end
+                    plt.fill_between(self.xv[0,split_line:],y,alpha = 0.2)
+                
             
             if (type(self.Grid_states) == np.ndarray):
                 
