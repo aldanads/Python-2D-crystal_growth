@@ -5,7 +5,7 @@ Created on Mon Nov  7 17:07:32 2022
 @author: ALDANADS
 """
 import numpy as np
-from defects import*
+from defects import Defects
 
 
 def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):

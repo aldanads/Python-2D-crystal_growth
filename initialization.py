@@ -5,12 +5,12 @@ Created on Wed Sep 14 20:15:19 2022
 @author: ALDANADS
 """
 
-from hex_lattice import*
+from hex_lattice import Hexagonal_lattice
 import numpy as np
 import matplotlib.pyplot as plt
 from defects import Cluster
-import random
-from datetime import datetime
+#import random
+#from datetime import datetime
 import shutil
 import os 
 
@@ -19,18 +19,17 @@ import os
 def initialization(parameters,n_sim,save_data):
 
     # Random seed as time
-    #random.seed(datetime.now())
     rng = np.random.default_rng() # Random Number Generator (RNG) object
 
     # Default resolution for figures
     plt.rcParams["figure.dpi"] = 300 # Default value of dpi = 300
     
     if save_data:
-        files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py']
+        files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py']
         dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsorption rate\\'
-        dst_data = save_simulation(files_copy,dst,n_sim) # Create folders and python files
+        paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
-        dst_data = ''
+        paths = ''
         
     
     """ --------------------------------------------------------------------------
@@ -117,7 +116,7 @@ def initialization(parameters,n_sim,save_data):
     
     MoS2_lattice.plot_lattice(crystal_orientation,'',0,0,True) # Initial state of the grid
     
-    return MoS2_lattice,MoS2_crystal,distribution_parameters, dst_data,rng
+    return MoS2_lattice,MoS2_crystal,distribution_parameters, paths,rng
 
 def save_simulation(files_copy,dst,n_sim):
     
@@ -130,10 +129,23 @@ def save_simulation(files_copy,dst,n_sim):
 
     os.makedirs(dst + program_directory)
     os.makedirs(dst + data_directoy)
-
-    dst_program = dst + program_directory
+    
+    paths = {'data': dst + data_directoy, 'program': dst + program_directory}
 
     for files in files_copy:
-        shutil.copyfile(files, dst_program+files)
+        shutil.copyfile(files, paths['program']+files)
         
-    return dst + data_directoy
+    return paths
+
+def save_variables(paths,variables):
+    
+    import shelve
+
+    filename = 'variables'
+    my_shelf = shelve.open(paths+filename,'n') # 'n' for new
+    
+    for key in variables:
+        my_shelf[key] = variables[key]
+
+    my_shelf.close()
+
