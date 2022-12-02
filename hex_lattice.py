@@ -81,11 +81,11 @@ class Hexagonal_lattice():
                 if split_regions['Boundary'] == 'vertical':
                     y = [self.yv[len(self.yv)-1,0]] * (len(self.yv)-split_line) # max value of y
                     # x go from the split line until the end
-                    plt.fill_between(self.xv[0,split_line:],y,alpha = 0.2)
+                    plt.fill_between(self.xv[0,split_line:],y,alpha = 0.2, color = 'blue')
                 elif split_regions['Boundary'] == 'horizontal':
                     x = [self.xv[0,len(self.xv)-1]] * (len(self.xv)-split_line) # max value of x
                     # y go from the split line until the end
-                    plt.fill_betweenx(self.yv[split_line:,0],x,alpha = 0.2)
+                    plt.fill_betweenx(self.yv[split_line:,0],x,alpha = 0.2, color = 'blue')
                 
             
             if (type(self.Grid_states) == np.ndarray):
@@ -198,7 +198,7 @@ class Hexagonal_lattice():
         self.adatom_flux = 0
         list_prob = np.zeros(length_xv)
 
-        if split_regions['Boundary'] == 'None': # Only one region
+        if split_regions['Boundary'] == 'none': # Only one region
             # If the fissure region is greater than the simulation domain, we cover the simulation domain
             if 2 * width_fissure > length_xv:
                 start_row = 0
@@ -213,7 +213,7 @@ class Hexagonal_lattice():
             
             for j in np.arange(start_row,finish_row):
                 
-                self.introduce_defects_j_row(j,list_prob[j],rng)
+                self.introduce_defects_j_row(j,prob_defects,rng)
                 
         elif split_regions['Boundary'] == 'vertical': # Two regions splitted by a vertical boundary
             start_row = 0

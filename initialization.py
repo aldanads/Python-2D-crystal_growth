@@ -26,7 +26,7 @@ def initialization(parameters,n_sim,save_data):
     
     if save_data:
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py']
-        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsorption rate\\'
+        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsortion_rate_2\\'
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
         paths = {'data': ''}
@@ -60,8 +60,8 @@ def initialization(parameters,n_sim,save_data):
 #     ACS applied materials & interfaces 11, no. 45 (2019): 42751-42759.
 # =============================================================================
 
-    E_mig_armchair_edge = 1.84 # Armchair direction
-    E_mig_zigzag_edge = 1.84 # Zigzag direction
+    E_mig_armchair_edge = 2 # Armchair direction
+    E_mig_zigzag_edge = 2 # Zigzag direction
     
     Backup_energy = [E_mig_zigzag,E_mig_armchair,E_nucleation,E_propagation,E_desorption,E_mig_zigzag_edge,E_mig_armchair_edge]
     
@@ -75,8 +75,10 @@ def initialization(parameters,n_sim,save_data):
     --------------- Grid _states ----------------
     ---------------------------------------------
     Sulfur = 1
-    Defect = 2
+    Mo adatom = 2
     Molibdenum = 3
+    Atom at the edge of the crystal = 4
+    Atom part of the crystal = 5
     Empty space = 0
     -----------------------------------------------------------------------------
     """
@@ -105,10 +107,10 @@ def initialization(parameters,n_sim,save_data):
     # 2 regions: etched and non-etched region
     # Boundary: 'vertical', 'horizontal', 'none'
     # Position: int - the row/column acting as a boundary and separe one region from the other
-    split_regions = {'Boundary' : 'horizontal', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[n_sim] + 0.0002}
+    split_regions = {'Boundary' : 'none', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[1][n_sim] + parameters[0]}
     
 
-    prob_defects = parameters[n_sim]
+    prob_defects = parameters[1][n_sim]
     crystal_orientation = True
     pair_atom_defect=(3,4) # Introduce the crystal seed
     distribution_parameters = [distribution[5],skewness,fissure_region,pair_atom_defect,prob_defects,split_regions,rng]

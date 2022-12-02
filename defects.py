@@ -515,6 +515,7 @@ class Cluster():
         self.cluster_ij = cluster_ij # List of tuples with the coordinates of the crystal
 
         self.cluster_size = sum(sum(Grid_states == 4)) + sum(sum(Grid_states == 5))
+        self.v_cluster_size = [self.cluster_size]
         self.Mo_sites = sum(sum(Grid_states > 1))
         self.coverage = self.cluster_size / self.Mo_sites
         
@@ -693,7 +694,7 @@ class Cluster():
     
     def crystal_area(self):
         
-        cluster_ij = self.cluster_ij
-        
+        self.v_cluster_size.append(self.cluster_size)
+
         
        
