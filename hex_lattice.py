@@ -24,7 +24,8 @@ class Hexagonal_lattice():
         self.Backup_energy = Backup_energy
         self.T = T
         self.time = [0]
-        
+        self.v_adatom_flux = [[],[]]
+
         self.create_hex_grid()
         self.pristine_crystal()
 
@@ -238,8 +239,8 @@ class Hexagonal_lattice():
         
 
             
-        # adatom flux --> adatoms adsorted by the substrate (adatoms / nm^2)
-        self.adatom_flux = self.adatom_flux / (self.x_axis * self.y_axis)
+        # adatom flux --> adatoms adsorted by the substrate
+        self.v_adatom_flux[0].append(self.adatom_flux)
         
     # Triangle distribution of defects
     def defect_triangle(self,prob_defects,fissure_region,rng):
@@ -448,6 +449,10 @@ class Hexagonal_lattice():
     def add_time(self,t):
         
         self.time.append(self.time[len(self.time)-1] + t)
+        
+    def net_flux(self,desorpted_adatoms):
+        
+        self.v_adatom_flux[1].append(self.v_adatom_flux[0][-1]-desorpted_adatoms)
         
             
             

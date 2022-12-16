@@ -26,7 +26,7 @@ def initialization(parameters,n_sim,save_data):
     
     if save_data:
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py']
-        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsortion_rate_2\\'
+        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsorption_rate_3\\'
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
         paths = {'data': ''}
@@ -51,6 +51,7 @@ def initialization(parameters,n_sim,save_data):
     E_propagation = 1.3 # Kink propagation (1.4 eV) --> Growing in zigzag direction
     #E_desorption = 1.52
     E_desorption = 1.3
+ 
     
 # =============================================================================
 #     # Edge diffusion comparable to the attachment barrier
@@ -107,7 +108,7 @@ def initialization(parameters,n_sim,save_data):
     # 2 regions: etched and non-etched region
     # Boundary: 'vertical', 'horizontal', 'none'
     # Position: int - the row/column acting as a boundary and separe one region from the other
-    split_regions = {'Boundary' : 'none', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[1][n_sim] + parameters[0]}
+    split_regions = {'Boundary' : 'none', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[1][n_sim]}
     
 
     prob_defects = parameters[1][n_sim]

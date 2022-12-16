@@ -27,6 +27,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     """
     
     time = 0
+    previous_step_desorption = events[1][8]
     pair_atom_defect = distribution_parameters[3]
     
     MoS2_lattice.defect_distributions(distribution_parameters)
@@ -87,6 +88,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
         
     MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
     MoS2_lattice.add_time(time)
+    MoS2_lattice.net_flux(events[1][8]-previous_step_desorption)
     MoS2_crystal.crystal_area() # Register the crystal size at this time
     return MoS2_lattice,MoS2_crystal,Mo_adatom,events
 
