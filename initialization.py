@@ -26,7 +26,7 @@ def initialization(parameters,n_sim,save_data):
     
     if save_data:
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py']
-        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsorption_rate_3\\'
+        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Vertical_inv_2\\'
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
         paths = {'data': ''}
@@ -106,12 +106,18 @@ def initialization(parameters,n_sim,save_data):
     defect_specie = 2 # Adatom = 2 // Crystal edge = 4 // Inner point of crystal = 5
     
     # 2 regions: etched and non-etched region
-    # Boundary: 'vertical', 'horizontal', 'none'
+    # Boundary: 'vertical', 'horizontal', 'none', diagonal right, diagonal left
+    mode = 5
+    Boundary = ['vertical right', 'vertical left', 'horizontal', 'none','diagonal right', 'diagonal left']
     # Position: int - the row/column acting as a boundary and separe one region from the other
-    split_regions = {'Boundary' : 'none', 'Position': round(len(xv[0])/2), 'ad_rate': parameters[1][n_sim]}
+    # Position: coordinates when it is diagional boundary
+    diagonal_right = [(int(i),int(i)) for i in np.arange(2 * device_size[0]/a - 1)]
+    diagonal_left = [(int(2 * device_size[0]/a-1 - i),int(i)) for i in np.arange(2 * device_size[0]/a - 1)]
+    Position = [round(len(xv[0])/2),round(len(xv[0])/2),round(len(xv[0])/2),round(len(xv[0])/2),diagonal_right,diagonal_left]
+    split_regions = {'Boundary' : Boundary[mode], 'Position': Position[mode], 'ad_rate': parameters[1][n_sim]}
     
 
-    prob_defects = parameters[1][n_sim]
+    prob_defects = parameters[0][n_sim]
     crystal_orientation = True
     pair_atom_defect=(3,4) # Introduce the crystal seed
     distribution_parameters = [distribution[5],skewness,fissure_region,pair_atom_defect,prob_defects,split_regions,rng]

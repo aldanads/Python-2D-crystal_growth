@@ -78,16 +78,34 @@ class Hexagonal_lattice():
                 
             if split_regions != False:
                 
-                split_line = split_regions['Position'] # The boundary position
-                if split_regions['Boundary'] == 'vertical':
+                if split_regions['Boundary'] == 'vertical right':
+                    split_line = split_regions['Position'] # The boundary position
                     y = [self.yv[len(self.yv)-1,0]] * (len(self.yv)-split_line) # max value of y
                     # x go from the split line until the end
+                    
+                    # Etched region - right
                     plt.fill_between(self.xv[0,split_line:],y,alpha = 0.2, color = 'blue')
+                    
+                elif split_regions['Boundary'] == 'vertical left':
+                     split_line = split_regions['Position'] # The boundary position
+                     y = [self.yv[len(self.yv)-1,0]] * (len(self.yv)-split_line) # max value of y
+                     # x go from the split line until the end
+                     
+                     # Etched region - Left
+                     plt.fill_between(self.xv[0,:split_line],y,alpha = 0.2, color = 'blue')
+                    
                 elif split_regions['Boundary'] == 'horizontal':
+                    split_line = split_regions['Position'] # The boundary position
                     x = [self.xv[0,len(self.xv)-1]] * (len(self.xv)-split_line) # max value of x
                     # y go from the split line until the end
                     plt.fill_betweenx(self.yv[split_line:,0],x,alpha = 0.2, color = 'blue')
-                
+                    
+                elif 'diagonal' in split_regions['Boundary']:
+                    diagonal = split_regions['Position'] # The boundary position
+                    x = [item[0] for item in diagonal]
+                    y = [item[1] for item in diagonal]
+                    plt.fill_between(self.xv[0,x],self.yv[y,0],alpha = 0.2, color = 'blue')
+
             
             if (type(self.Grid_states) == np.ndarray):
                 
@@ -216,11 +234,21 @@ class Hexagonal_lattice():
                 
                 self.introduce_defects_j_row(j,prob_defects,rng)
                 
-        elif split_regions['Boundary'] == 'vertical': # Two regions splitted by a vertical boundary
+        elif split_regions['Boundary'] == 'vertical right': # Two regions splitted by a vertical boundary
             start_row = 0
             finish_row = length_xv    
             list_prob[0:split_regions['Position']] = prob_defects
             list_prob[split_regions['Position']:] = split_regions['ad_rate']
+            
+            for j in np.arange(start_row,finish_row):
+                
+                self.introduce_defects_j_row(j,list_prob[j],rng)
+                
+        elif split_regions['Boundary'] == 'vertical left': # Two regions splitted by a vertical boundary
+            start_row = 0
+            finish_row = length_xv    
+            list_prob[0:split_regions['Position']] = split_regions['ad_rate']
+            list_prob[split_regions['Position']:] = prob_defects
             
             for j in np.arange(start_row,finish_row):
                 
@@ -233,7 +261,14 @@ class Hexagonal_lattice():
             for j in np.arange(start_row,finish_row):
                 
                 self.introduce_defects_j_row(j,prob_defects,rng,split_regions)
-
+                
+        elif 'diagonal' in split_regions['Boundary']:
+            start_row = 0
+            finish_row = length_xv  
+            
+            for j in np.arange(start_row,finish_row):
+                
+                self.introduce_defects_j_row(j,prob_defects,rng,split_regions)
         
         self.list_prob = list_prob
         
@@ -434,6 +469,10 @@ class Hexagonal_lattice():
             # Two lists: Before the split line and after the split line
             defects_j_column = list(rng.random(sum(self.Grid_states[:split_regions['Position'],j] == self.atomic_specie)) < prob_defects) 
             defects_j_column_aux = list(rng.random(sum(self.Grid_states[split_regions['Position']:,j] == self.atomic_specie)) < split_regions['ad_rate'])
+            defects_j_column += defects_j_column_aux
+        elif 'diagonal' in split_regions['Boundary']:
+            defects_j_column = list(rng.random(sum(self.Grid_states[:split_regions['Position'][j][0],j] == self.atomic_specie)) < split_regions['ad_rate']) 
+            defects_j_column_aux = list(rng.random(sum(self.Grid_states[split_regions['Position'][j][0]:,j] == self.atomic_specie)) < prob_defects)
             defects_j_column += defects_j_column_aux
             
         self.adatom_flux += sum(defects_j_column)
