@@ -25,9 +25,11 @@ class Hexagonal_lattice():
         self.T = T
         self.time = [0]
         self.v_adatom_flux = [[],[]]
+        self.n_defects = []
 
         self.create_hex_grid()
         self.pristine_crystal()
+        
 
     
     def create_hex_grid(self):
@@ -70,7 +72,7 @@ class Hexagonal_lattice():
         # Moldibdenum atomic radius: 139 pm
         # Change s to make them in scale
         
-            if (grid == True) or self.x_axis <= 50:
+            if (grid == True):
                 plt.scatter(self.xv[1::2,0::3],self.yv[1::2,0::3],color = self.atom_colors[0],s=1) # Sulfur
                 plt.scatter(self.xv[0::2,1::3],self.yv[0::2,1::3],color = self.atom_colors[0],s=1) # Sulfur
                 plt.scatter(self.xv[0::2,0::3],self.yv[0::2,0::3],color = self.atom_colors[1],s=1.39) # Molibdenum
@@ -90,7 +92,6 @@ class Hexagonal_lattice():
                      split_line = split_regions['Position'] # The boundary position
                      y = [self.yv[len(self.yv)-1,0]] * (len(self.yv)-split_line) # max value of y
                      # x go from the split line until the end
-                     
                      # Etched region - Left
                      plt.fill_between(self.xv[0,:split_line],y,alpha = 0.2, color = 'blue')
                     
@@ -122,7 +123,6 @@ class Hexagonal_lattice():
                     aux = np.asarray(cluster_ij)
                     cluster_ij = ([aux[i][0] for i in np.arange(len(aux))],[aux[i][1] for i in np.arange(len(aux))])
                 
-                #print(cluster_ij)
 
                 plt.scatter(self.xv[cluster_ij[0],cluster_ij[1]],self.yv[cluster_ij[0],cluster_ij[1]], color = self.atom_colors[3],s=5)
 
@@ -132,11 +132,15 @@ class Hexagonal_lattice():
                 plt.legend([arrow1,arrow2], ['Armchair','Zigzag'])
             plt.xlabel ("X axis (nm)")
             plt.ylabel ("Y axis (nm)")
+            plt.xlim([-1,self.x_axis+1])
+            plt.ylim([-1,self.y_axis+1])
+
             
             if path == '':
                 plt.show()
             else:
-                plt.savefig(path+str(i)+'_t(s) = '+str(round(t,5))+' .png', dpi = 100)
+                plt.savefig(path+str(i)+'_t(s) = '+str(round(t,5))+' .png', dpi = 300)
+                plt.clf()
     
     
     # Generic hexagonal grid
@@ -451,7 +455,7 @@ class Hexagonal_lattice():
         n_defects = np.count_nonzero(self.Grid_states == 2)
         coord_xy_defects = np.where(self.Grid_states == 2)
         self.coord_xy_defects = coord_xy_defects
-        self.n_defects = n_defects
+        self.n_defects.append(n_defects)
         # Transform the coordinate in a list of tuples --> Easier to compare with other tuples
         coord_xy_defects = [(coord_xy_defects[0][i],coord_xy_defects[1][i]) for i in np.arange(len(coord_xy_defects[0]))]
         

@@ -26,7 +26,7 @@ def initialization(parameters,n_sim,save_data):
     
     if save_data:
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py']
-        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Vertical_inv_2\\'
+        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsorption_rate_4\\'
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
         paths = {'data': ''}
@@ -107,7 +107,7 @@ def initialization(parameters,n_sim,save_data):
     
     # 2 regions: etched and non-etched region
     # Boundary: 'vertical', 'horizontal', 'none', diagonal right, diagonal left
-    mode = 5
+    mode = 3
     Boundary = ['vertical right', 'vertical left', 'horizontal', 'none','diagonal right', 'diagonal left']
     # Position: int - the row/column acting as a boundary and separe one region from the other
     # Position: coordinates when it is diagional boundary
