@@ -18,10 +18,10 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     ----- Coordinates and labels of adatoms and defects at the crystal edge ---
     """
     coord_Mo = MoS2_lattice.coord_defects() # Search the coordinates of every defects - Update at every time step
-    edge_ij = MoS2_crystal.edge_ij # Edge of the cluster
-    xy_adatom_edge = coord_Mo+edge_ij # Edge of the cluster and adatoms
+    edge_ij = MoS2_crystal.edge_ij # Atoms at edge of the cluster
+    xy_adatom_edge = coord_Mo+edge_ij # Atoms at edge of the cluster and adatoms
     l_defect_species = np.zeros(len(xy_adatom_edge))+2
-    l_defect_species[len(coord_Mo):] = 4 # Label of defects (adatoms = 2 and edge of the cluster = 4)
+    l_defect_species[len(coord_Mo):] = 4 # Label of defects (adatoms = 2 and atoms at edge of the cluster = 4)
     """
     ---------------------------------------------------------------------------
     """
