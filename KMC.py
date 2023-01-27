@@ -58,44 +58,25 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     
     # We search in our binary tree the events that happen
     chosen_event = search_value(TR_tree,sumTR*rng.random())
-    print(chosen_event[1])
-    
-    sys.exit("Error message")
-    
-    
-    # pointer_event = TR[0]
-    # s = 0
 
-    # while (pointer_event < sum_TR):
-    #     s += 1
-    #     pointer_event += TR[s]
-
-
-    #Calculate the time
+    #Calculate the time step
     time =  -np.log(rng.random())/sumTR
-    # if time > tmax:
-    #     tmax=time
-        
-    # The probability of an event happening at a specific time
-    # event_prob=1.0-np.exp(-TR[s]*time);
-    
 
-    """
-    --------------------------------------------------------------------
-    """
     # events[0][1:] += Mo_adatom.allowed_events[1:]
-    
-    #if rng.random() < event_prob:
-        
 
-        # Update the Grid with the chosen events
-    Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) 
-    events[1][s+1] += 1
-    events[1][0] += 1
+    # Update the Grid with the chosen events
+    Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,chosen_event[1],xy_adatom_edge[chosen_event[2]][0],xy_adatom_edge[chosen_event[2]][1],l_defect_species[chosen_event[2]]) 
+    # events[1][s+1] += 1
+    # events[1][0] += 1
 
+    print(chosen_event[1]+1)
+    MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
+    MoS2_lattice.coord_defects()
+    MoS2_lattice.plot_lattice()
+    sys.exit("Error message")
 
-    if (s+1 >= 7): # Update the crystal -> New adatom joined
-        Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),s,(Mo_adatom.i,Mo_adatom.j))
+    if (chosen_event[1]+1 >= 7): # Update the crystal -> New adatom joined
+        Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),chosen_event[1],(Mo_adatom.i,Mo_adatom.j))
  
         
     #MoS2_lattice.plot_lattice()

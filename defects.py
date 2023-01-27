@@ -387,15 +387,17 @@ class Defects():
         """
         
 
-    def processes(self,Grid_states,s):
+    def processes(self,Grid_states,s,i,j,defect_specie):
         
         s = s+1 # s is selected from TR, which is smaller than allowed_events
         
-        i = self.i
-        j = self.j
+        # i = self.i
+        # j = self.j
         
         atomic_specie = self.atomic_specie
-        defect_specie = self.defect_specie
+        #defect_specie = self.defect_specie
+        length_x = len(Grid_states)-1
+
         
         """ Adatom migration: Mo migrating to Mo positions
             # Mo left (2) or Mo right (3) allowed_events[0]
@@ -417,12 +419,12 @@ class Defects():
             Grid_states[i,j] = 3
             return Grid_states
         
-        elif self.allowed_events[0] == 2: # Mo left (2) 
+        # Mo right (2)
+        elif ((i>0) and (Grid_states[i-1,j] == 0)) or ((i<length_x) and (Grid_states[i+1,j] == 0)): 
         
             """
             ---------------------- Migration ----------------------------------
             """
-            
         
             if (s == 1 or s == 9): # Down - Zigzag
                 Grid_states[i,j] = atomic_specie
@@ -458,11 +460,13 @@ class Defects():
                 self.i = i-1
                 self.j = j+1
         
-        elif self.allowed_events[0] == 3: # Mo right (3)
+        # Mo right (3)
+        elif ((i>0) and (Grid_states[i-1,j] == 1)) or ((i<length_x) and (Grid_states[i+1,j] == 1)): 
         
             """
             ---------------------- Migration ----------------------------------
             """
+
             
             if (s == 1 or s == 9): # Down - Zigzag
                 Grid_states[i,j] = atomic_specie
@@ -498,6 +502,7 @@ class Defects():
                 self.i = i-1
                 self.j = j+2
             
+        print(defect_specie,self.i,self.j)
         return Grid_states
     
 
