@@ -8,14 +8,14 @@ from initialization import *
 from KMC import KMC
 #import shelve
 
-save_data = True
-save_var = True
+save_data = False
+save_var = False
 
 
 #Temperature = [600, 700, 800, 900, 1000, 1100, 1200]
 etched_adsortion_rate = [0.00005,0.0001,0.00015,0.0002,0.00025,0.0003,0.00035,0.0004]
 #etched_adsortion_rate = [0.00015] * len(Temperature)
-non_etched_ad_rate = [0.00015] * len(Temperature)
+non_etched_ad_rate = [0.00015] * len(etched_adsortion_rate)
 
 
 

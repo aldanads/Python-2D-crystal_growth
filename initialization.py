@@ -38,7 +38,7 @@ def initialization(parameters,n_sim,save_data):
     """ 
     a=0.639 # nm
     b=0.639 # nm
-    device_size = (50, 50) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
+    device_size = (5, 5) # Size of the grid in nm. grid_size[0] is x and grid_size[1] is y.
     atom_colors=['orange','purple','blue', 'black'] # MoS2 -> First is Sulfur, second is Mo and third Vs
     
 # =============================================================================

@@ -398,7 +398,7 @@ class Hexagonal_lattice():
             if self.Grid_states[x-1,y] == 0:
                 self.Grid_states[x,y] = self.defect_specie 
                 self.Grid_states[x+1,y+1] = self.defect_specie
-                
+                self.Grid_states[x+5,y+1] = 2
                 self.Grid_states[x+2,y-3] = self.defect_specie
                 self.Grid_states[x-2,y-3] = self.defect_specie
                 self.Grid_states[x,y-3] = self.defect_specie 
@@ -408,6 +408,8 @@ class Hexagonal_lattice():
             else:
                 self.Grid_states[x,y] = self.defect_specie 
                 self.Grid_states[x+1,y+2] = self.defect_specie
+                self.Grid_states[x+3,y+1] = 2
+
                 
                 self.Grid_states[x+2,y-3] = self.defect_specie
                 self.Grid_states[x-2,y-3] = self.defect_specie
@@ -426,7 +428,8 @@ class Hexagonal_lattice():
   
                 self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+1] = self.defect_specie
-                
+                self.Grid_states[x+3,y+j+1] = 2
+
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
                 self.Grid_states[x-2,y+j-3] = self.defect_specie
                 self.Grid_states[x,y+j-3] = self.defect_specie 
@@ -439,6 +442,7 @@ class Hexagonal_lattice():
                 self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+2] = self.defect_specie
                 self.Grid_states[x+1,y+j+1] = self.defect_specie
+                self.Grid_states[x+3,y+j+1] = 2
 
                 
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
