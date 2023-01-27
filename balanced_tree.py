@@ -18,8 +18,6 @@ def build_tree(arr):
         return Node(arr[0])
     mid = len(arr)//2
     root = Node(None)
-    #print(len(arr)/2)
-    #print(arr[:mid], arr[mid:])
     root.left = build_tree(arr[:mid])
     root.right = build_tree(arr[mid:])
     return root
@@ -34,6 +32,9 @@ def update_data(root):
     
     # Superior nodes are the sum of their childrens - Leaf are tuples, but the
     # nodes are floats
+    # Tuple[0] = Transition rate
+    # Tuple[1] = Type of event
+    # Tuple[2] = Particle selected
     if root.left is not None and root.right is not None:
         if type(root.left.data) != tuple: 
             aux_l = root.left.data
@@ -60,21 +61,44 @@ def update_data(root):
             root.data = root.right.data[0] 
     return root.data
 
-def search_value(root,value,found = False):
-    if root is None or found is not False:
-        return found
+def search_value(root,target):
 
-    if (root.left is None) and (root.right is None) and (root.data == value):
-        found = root.data
+    # Base case --> We go all the way down and the node is null
+    # ATTENTION! -> Take care, some of them are tuples and other floats
+    if type(root.data) != tuple:
+        aux = root.data
+    else:
+        aux = root.data[0]
+        
+    # If it is None, is the leaf
+    if (root.left is not None) and (type(root.left.data) != tuple):
+        aux_l = root.left.data
+    elif (root.left is not None):
+        aux_l = root.left.data[0]
     
-    found = search_value(root.left, value,found)
-    found = search_value(root.right, value,found)
     
-    return found
-
+    if root is None:
+        return False
+    
+    # We find the value among the leafs - Only interested in leafs, so we set the two extra conditions:
+    # root.left and root.right is None.
+    # The target should be smaller than the leaf we are checking to select that node
+    elif (root.left is None) and (root.right is None) and target <= aux:
+        return root.data
+    else:
+        #print(root.data)
+        if target <= aux_l:
+            return search_value(root.left, target)
+        else:
+            # Remember: nodes are the sum of their children. 
+            # Because of that, if the target is greater than the left side, 
+            # we operate target - root.left.data
+            return search_value(root.right,target-aux_l)
+        
+    
 # example usage:
 # arr = [1, 2, 3, 4, 5, 6, 7]
-# arr.sort(reverse = True)
+# arr.sort()
 # root = build_tree(arr)
 # total = update_data(root)
 # print(total)

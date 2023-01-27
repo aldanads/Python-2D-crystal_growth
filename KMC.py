@@ -33,61 +33,71 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     pair_atom_defect = distribution_parameters[3]
     
     MoS2_lattice.defect_distributions(distribution_parameters)
-    TR = []
     
+    # Calculate the transition rates of all the events
+    TR = []
     for i in np.arange(len(xy_adatom_edge)):
 
-    
         Mo_adatom = Defects(xy_adatom_edge[i][0],xy_adatom_edge[i][1],MoS2_lattice.Backup_energy,pair_atom_defect[0],T,Grid_states,MoS2_crystal.join_cluster_ij,l_defect_species[i])
-        #TR.extend((Mo_adatom.TR,i)) # Transition rates
+        # =============================================================================
+        #         TR[0] = Transition rate
+        #         TR[1] = Type of event
+        #         TR[2] = Particle selected
+        # =============================================================================
         TR.extend([(Mo_adatom.TR[j],j, i) for j in np.arange(len(Mo_adatom.TR)) if Mo_adatom.TR[j] != 0.0])
-        
+
     """
     ------------- Select event with kinetic Monte Carlo technique ------
     """
-    sumTR = sum(np.array([TR[j][0] for j in np.arange(len(TR))]))*rng.random()
-    sorted(TR,key = lambda x:x[0], reverse = True)
-    print (TR)
-    print(sumTR)
+    # Sort the list of events
+    sorted(TR,key = lambda x:x[0])
+    # Build a balanced tree structure
+    TR_tree = build_tree(TR)
+    # Each node is the sum of their children, starting from the leaf
+    sumTR = update_data(TR_tree)
+    
+    # We search in our binary tree the events that happen
+    chosen_event = search_value(TR_tree,sumTR*rng.random())
+    print(chosen_event[1])
     
     sys.exit("Error message")
     
     
-    pointer_event = TR[0]
-    s = 0
+    # pointer_event = TR[0]
+    # s = 0
 
-    while (pointer_event < sum_TR):
-        s += 1
-        pointer_event += TR[s]
+    # while (pointer_event < sum_TR):
+    #     s += 1
+    #     pointer_event += TR[s]
 
 
     #Calculate the time
-    time =  -np.log(rng.random())/sum(TR)
+    time =  -np.log(rng.random())/sumTR
     # if time > tmax:
     #     tmax=time
         
     # The probability of an event happening at a specific time
-    event_prob=1.0-np.exp(-TR[s]*time);
+    # event_prob=1.0-np.exp(-TR[s]*time);
     
 
     """
     --------------------------------------------------------------------
     """
-    events[0][1:] += Mo_adatom.allowed_events[1:]
+    # events[0][1:] += Mo_adatom.allowed_events[1:]
     
-    if rng.random() < event_prob:
+    #if rng.random() < event_prob:
         
 
         # Update the Grid with the chosen events
-        Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) 
-        events[1][s+1] += 1
-        events[1][0] += 1
+    Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,s) 
+    events[1][s+1] += 1
+    events[1][0] += 1
 
 
-        if (s+1 >= 7): # Update the crystal -> New adatom joined
-            Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),s,(Mo_adatom.i,Mo_adatom.j))
+    if (s+1 >= 7): # Update the crystal -> New adatom joined
+        Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),s,(Mo_adatom.i,Mo_adatom.j))
  
-            
+        
     #MoS2_lattice.plot_lattice()
         
         
