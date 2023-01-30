@@ -34,56 +34,62 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     
     MoS2_lattice.defect_distributions(distribution_parameters)
     
-    # Calculate the transition rates of all the events
-    TR = []
-    for i in np.arange(len(xy_adatom_edge)):
-
-        Mo_adatom = Defects(xy_adatom_edge[i][0],xy_adatom_edge[i][1],MoS2_lattice.Backup_energy,pair_atom_defect[0],T,Grid_states,MoS2_crystal.join_cluster_ij,l_defect_species[i])
-        # =============================================================================
-        #         TR[0] = Transition rate
-        #         TR[1] = Type of event
-        #         TR[2] = Particle selected
-        # =============================================================================
-        TR.extend([(Mo_adatom.TR[j],j, i) for j in np.arange(len(Mo_adatom.TR)) if Mo_adatom.TR[j] != 0.0])
-
-    """
-    ------------- Select event with kinetic Monte Carlo technique ------
-    """
-    # Sort the list of events
-    sorted(TR,key = lambda x:x[0])
-    # Build a balanced tree structure
-    TR_tree = build_tree(TR)
-    # Each node is the sum of their children, starting from the leaf
-    sumTR = update_data(TR_tree)
+    for k in np.arange(len(xy_adatom_edge)):
+        # Calculate the transition rates of all the events
+        TR = []
+        for i in np.arange(len(xy_adatom_edge)):
     
-    # We search in our binary tree the events that happen
-    chosen_event = search_value(TR_tree,sumTR*rng.random())
-
-    #Calculate the time step
-    time =  -np.log(rng.random())/sumTR
-
-    # events[0][1:] += Mo_adatom.allowed_events[1:]
-
-    # Update the Grid with the chosen events
-    Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,chosen_event[1],xy_adatom_edge[chosen_event[2]][0],xy_adatom_edge[chosen_event[2]][1],l_defect_species[chosen_event[2]]) 
-    # events[1][s+1] += 1
-    # events[1][0] += 1
-
-    print(chosen_event[1]+1)
-    MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
-    MoS2_lattice.coord_defects()
-    MoS2_lattice.plot_lattice()
+            Mo_adatom = Defects(xy_adatom_edge[i][0],xy_adatom_edge[i][1],MoS2_lattice.Backup_energy,pair_atom_defect[0],T,Grid_states,MoS2_crystal.join_cluster_ij,l_defect_species[i])
+            # =============================================================================
+            #         TR[0] = Transition rate
+            #         TR[1] = Type of event
+            #         TR[2] = Particle selected
+            # =============================================================================
+            TR.extend([(Mo_adatom.TR[j],j, i) for j in np.arange(len(Mo_adatom.TR)) if Mo_adatom.TR[j] != 0.0])
+    
+        """
+        ------------- Select event with kinetic Monte Carlo technique ------
+        """
+        # Sort the list of events
+        sorted(TR,key = lambda x:x[0])
+        # Build a balanced tree structure
+        TR_tree = build_tree(TR)
+        # Each node is the sum of their children, starting from the leaf
+        sumTR = update_data(TR_tree)
+        
+        # We search in our binary tree the events that happen
+        chosen_event = search_value(TR_tree,sumTR*rng.random())
+    
+        #Calculate the time step
+        time =  -np.log(rng.random())/sumTR
+    
+        # events[0][1:] += Mo_adatom.allowed_events[1:]
+    
+        # Update the Grid with the chosen events
+        Grid_states = Mo_adatom.processes(MoS2_crystal.Grid_states,chosen_event[1],xy_adatom_edge[chosen_event[2]][0],xy_adatom_edge[chosen_event[2]][1],l_defect_species[chosen_event[2]]) 
+        # events[1][s+1] += 1
+        # events[1][0] += 1
+        print(chosen_event[1]+1)
+        print(TR)
+    
+        """
+        #Updates
+        """
+        # Crystal update
+        if (chosen_event[1]+1 >= 7): # Update the crystal -> New adatom joined
+            Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),chosen_event[1],(Mo_adatom.i,Mo_adatom.j))
+            #if (chosen_event[1]+1 == 7):
+             #   l_defect_species[chosen_event[2]] = 4
+        else:
+            # Adatom migration update
+            MoS2_lattice.coord_xy_defects[0][chosen_event[2]],MoS2_lattice.coord_xy_defects[1][chosen_event[2]] = Mo_adatom.i, Mo_adatom.j
+            #xy_adatom_edge[chosen_event[2]][0],xy_adatom_edge[chosen_event[2]][1] = Mo_adatom.i, Mo_adatom.j
+        MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
+        MoS2_lattice.plot_lattice()
+        
+    
+    
     sys.exit("Error message")
-
-    if (chosen_event[1]+1 >= 7): # Update the crystal -> New adatom joined
-        Grid_states = MoS2_crystal.crystal_update(Grid_states,(xy_adatom_edge[i][0],xy_adatom_edge[i][1]),chosen_event[1],(Mo_adatom.i,Mo_adatom.j))
- 
-        
-    #MoS2_lattice.plot_lattice()
-        
-        
-        
-    MoS2_lattice.Grid_states = Grid_states # Store the new lattice state
     MoS2_lattice.add_time(time)
     MoS2_lattice.net_flux(events[1][8]-previous_step_desorption)
     MoS2_crystal.crystal_area() # Register the crystal size at this time

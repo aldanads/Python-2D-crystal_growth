@@ -109,14 +109,11 @@ class Hexagonal_lattice():
 
             
             if (type(self.Grid_states) == np.ndarray):
-                print(hasattr(self,'coord_xy_defects'))
                 if hasattr(self,'coord_xy_defects') == False:
                     coord_xy_defects = np.where(self.Grid_states == 2)
                     #print(coord_xy_defects[0],coord_xy_defects[1])
                     plt.scatter(self.xv[coord_xy_defects[0],coord_xy_defects[1]],self.yv[coord_xy_defects[0],coord_xy_defects[1]], color = self.atom_colors[2],s=5)
                 else:
-                    print('hi')
-                    print(self.coord_xy_defects[0],self.coord_xy_defects[1])
                     plt.scatter(self.xv[self.coord_xy_defects[0],self.coord_xy_defects[1]],self.yv[self.coord_xy_defects[0],self.coord_xy_defects[1]], color = self.atom_colors[2],s=5)
                 
                 

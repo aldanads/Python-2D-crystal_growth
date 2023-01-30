@@ -502,7 +502,6 @@ class Defects():
                 self.i = i-1
                 self.j = j+2
             
-        print(defect_specie,self.i,self.j)
         return Grid_states
     
 
@@ -529,7 +528,10 @@ class Cluster():
         self.join_cluster_ij = []   
         
         # Calculate the region where adatoms can join the crystal
-        self.clustering_region(Grid_states,cluster_ij)
+        # Update: Inner part of the crystal is 5
+        # The edge remains 4
+        self.clustering_region(Grid_states,cluster_ij) 
+        
 
         edge_ij = np.where(self.Grid_states == 4) # Coordinates of the edge
         edge_ij = [(edge_ij[0][i],edge_ij[1][i]) for i in np.arange(len(edge_ij[0]))] # Convert to tuples
