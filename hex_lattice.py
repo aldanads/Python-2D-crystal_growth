@@ -66,7 +66,7 @@ class Hexagonal_lattice():
             
         
     
-    def plot_lattice(self,crystal_orientation = False, path = '',t=0,i=0, grid=False,cluster_ij = False,split_regions = False):
+    def plot_lattice(self,crystal_orientation = False, path = '',t=0,i=0, grid=True,cluster_ij = False,split_regions = False):
         
         # Sulfur atomic radius: 100 pm
         # Moldibdenum atomic radius: 139 pm
@@ -458,6 +458,7 @@ class Hexagonal_lattice():
         
         n_defects = np.count_nonzero(self.Grid_states == 2)
         coord_xy_defects = np.where(self.Grid_states == 2)
+        coord_xy_defects = (list(coord_xy_defects[0]),list(coord_xy_defects[1]))
         self.coord_xy_defects = coord_xy_defects
         self.n_defects.append(n_defects)
         # Transform the coordinate in a list of tuples --> Easier to compare with other tuples

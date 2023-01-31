@@ -9,7 +9,7 @@ import numpy as np
 class Defects():
     
     
-    def __init__(self,i,j,Backup_energy,atomic_specie,T,Grid_states,join_cluster_ij,defect_specie):
+    def __init__(self,i,j,Backup_energy,atomic_specie,T,Grid_states,join_cluster_ij):
         
         self.i = i
         self.j = j
@@ -28,7 +28,7 @@ class Defects():
                      Backup_energy[5],Backup_energy[5],Backup_energy[6],Backup_energy[6],Backup_energy[6],Backup_energy[6]]
 
         self.atomic_specie = atomic_specie
-        self.defect_specie = defect_specie
+        self.defect_specie = Grid_states[i,j]
         
         # Calculate the transition rates
         self.TR(T,Grid_states,join_cluster_ij)
@@ -387,7 +387,7 @@ class Defects():
         """
         
 
-    def processes(self,Grid_states,s,i,j,defect_specie):
+    def processes(self,Grid_states,s,i,j):
         
         s = s+1 # s is selected from TR, which is smaller than allowed_events
         
@@ -395,7 +395,7 @@ class Defects():
         # j = self.j
         
         atomic_specie = self.atomic_specie
-        #defect_specie = self.defect_specie
+        defect_specie = self.defect_specie
         length_x = len(Grid_states)-1
 
         
