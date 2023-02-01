@@ -214,7 +214,7 @@ class Hexagonal_lattice():
         a = (self.xv[0,1]-self.xv[0,0])*2 # lattice constant a (nm)
 
         irradiated_row = fissure_region[0] # Middle point of the triangle base
-        # Half of the triangle base
+        # Half of the region
         width_fissure = fissure_region[1]*2/a # half width of fissure region in columns
         
         length_xv = len(self.xv[0])

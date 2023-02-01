@@ -44,13 +44,13 @@ def initialization(parameters,n_sim,save_data):
 # =============================================================================
 #     # Activation energies 
 # =============================================================================
-    E_mig_zigzag = 1.2 # Zigzag direction
-    E_mig_armchair = 1.2 # Armchair direction
+    E_mig_zigzag = 1.3 # Zigzag direction
+    E_mig_armchair = 1.3 # Armchair direction
 
-    E_nucleation = 1.6 # Kink nucleation (1.7 eV) --> Growing in armchair direction
-    E_propagation = 1.3 # Kink propagation (1.4 eV) --> Growing in zigzag direction
+    E_nucleation = 1.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
+    E_propagation = 1.4 # Kink propagation (1.4 eV) --> Growing in zigzag direction
     #E_desorption = 1.52
-    E_desorption = 1.3
+    E_desorption = 1.4
  
     
 # =============================================================================
