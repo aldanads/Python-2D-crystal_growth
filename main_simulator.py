@@ -8,35 +8,35 @@ from initialization import *
 from KMC import KMC
 #import shelve
 
-save_data = False
-save_var = False
+save_data = True
+save_var = True
 
 
 #Temperature = [600, 700, 800, 900, 1000, 1100, 1200]
-etched_adsortion_rate = [0.00005,0.0001,0.00015,0.0002,0.00025,0.0003,0.00035,0.0004]
+etched_adsortion_rate = [0.00005,0.0001,0.00015,0.0002,0.00025,0.0003,0.00035,0.0004,0.00045,0.00050,0.00055,0.0006,0.00065]
 #etched_adsortion_rate = [0.00015] * len(Temperature)
-non_etched_ad_rate = [0.00015] * len(etched_adsortion_rate)
-
+#non_etched_ad_rate = [0.00015] * len(etched_adsortion_rate)
+non_etched_ad_rate = [0.00015,0.0002,0.00025,0.0003,0.00035,0.0004,0.00045,0.00050,0.00055,0.0006,0.00065,0.0007,0.00075]
 
 
 parameters = [non_etched_ad_rate,etched_adsortion_rate]
 
-for n_sim in np.arange(len(etched_adsortion_rate)):
+for n_sim in np.arange(len(non_etched_ad_rate)):
 
     MoS2_lattice, MoS2_crystal,distribution_parameters,paths,rng = initialization(parameters,n_sim,save_data)
-    events = [np.zeros(15),np.zeros(15)]
+    events = [0]*15
     
     i = 0
     j = 0
     while MoS2_crystal.coverage < 0.17:
         i += 1
-        MoS2_lattice, MoS2_crystal,Mo_adatom,events = KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng)
+        MoS2_lattice, MoS2_crystal,events = KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng)
 
-        if i%100 == 0:
+        if i%500 == 0:
             j += 1
             MoS2_lattice.plot_lattice(False,paths['data'],MoS2_lattice.time[-1],j,False,MoS2_crystal.cluster_ij,distribution_parameters[5])
             print ('Step: ',i, ' Time (s): ',round(MoS2_lattice.time[-1],4),' Coverage (%): ',round(100*MoS2_crystal.coverage,4))
-            print (sum(np.array(MoS2_lattice.v_adatom_flux)[0])/MoS2_lattice.time[-1]/8112)
+            print (sum(np.array(MoS2_lattice.v_adatom_flux)[0])/MoS2_lattice.time[-1]/MoS2_crystal.Mo_sites)
     # Variables to save
     variables = {'MoS2_lattice' : MoS2_lattice, 
                'MoS2_crystal': MoS2_crystal}

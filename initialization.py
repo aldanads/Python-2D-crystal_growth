@@ -26,7 +26,7 @@ def initialization(parameters,n_sim,save_data):
     
     if save_data:
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py']
-        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Triangles_new\Adsorption_rate_6\\'
+        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\kMC2\Adsorption_rate_7\\'
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
         paths = {'data': ''}
@@ -44,13 +44,13 @@ def initialization(parameters,n_sim,save_data):
 # =============================================================================
 #     # Activation energies 
 # =============================================================================
-    E_mig_zigzag = 1.3 # Zigzag direction
-    E_mig_armchair = 1.3 # Armchair direction
+    E_mig_zigzag = 1.2 # Zigzag direction
+    E_mig_armchair = 1.2 # Armchair direction
 
-    E_nucleation = 1.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
-    E_propagation = 1.4 # Kink propagation (1.4 eV) --> Growing in zigzag direction
+    E_nucleation = 1.3 # Kink nucleation (1.7 eV) --> Growing in armchair direction
+    E_propagation = 1.0 # Kink propagation (1.4 eV) --> Growing in zigzag direction
     #E_desorption = 1.52
-    E_desorption = 1.4
+    E_desorption = 1.1
  
     
 # =============================================================================
@@ -61,8 +61,8 @@ def initialization(parameters,n_sim,save_data):
 #     ACS applied materials & interfaces 11, no. 45 (2019): 42751-42759.
 # =============================================================================
 
-    E_mig_armchair_edge = 1.84 # Armchair direction
-    E_mig_zigzag_edge = 1.84 # Zigzag direction
+    E_mig_armchair_edge = 1.3 # Armchair direction
+    E_mig_zigzag_edge = 1.3 # Zigzag direction
     
     Backup_energy = [E_mig_zigzag,E_mig_armchair,E_nucleation,E_propagation,E_desorption,E_mig_zigzag_edge,E_mig_armchair_edge]
     

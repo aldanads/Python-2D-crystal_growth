@@ -22,16 +22,102 @@ class Defects():
         # Backup_energy[5] - E_mig_zigzag_edge
         # Backup_energy[6] - E_mig_armchair_edge
 
-        self.Act_E =[Backup_energy[0],Backup_energy[0],Backup_energy[1],Backup_energy[1],Backup_energy[1],Backup_energy[1],
-                     Backup_energy[2],
-                     Backup_energy[4],
-                     Backup_energy[5],Backup_energy[5],Backup_energy[6],Backup_energy[6],Backup_energy[6],Backup_energy[6]]
+        self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],
+                     Backup_energy[0][2],
+                     Backup_energy[0][4],
+                     Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]]
+
+        self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],
+                     Backup_energy[1][2],
+                     Backup_energy[1][4],
+                     Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]])
 
         self.atomic_specie = atomic_specie
         self.defect_specie = Grid_states[i,j]
         
         # Calculate the transition rates
-        self.TR(T,Grid_states,join_cluster_ij)
+        self.TR(Grid_states,join_cluster_ij)
+        self.neighbors(i, j, Grid_states)
+        
+        
+    """
+    ---------------- Calculate neighbors -------------------------
+    """
+        
+    
+    def neighbors(self,i,j,Grid_states):
+        
+        List_neighbors = []
+        length_x = len(Grid_states)-1
+        length_y = len(Grid_states[0])-1
+        
+        if ((i>0) and (Grid_states[i-1,j] == 0)) or ((i<length_x) and (Grid_states[i+1,j] == 0)):
+        # 0
+        # 2: Mo (Grid_states) Left Mo --------------------------------------------
+        # 0
+        
+            """
+            Check up and down
+            """
+            if (i>1) and ((Grid_states[i-2,j] == 2) or (Grid_states[i-2,j] == 4)): # Down
+               List_neighbors.append((i-2,j))
+               
+            if (i<length_x-1) and ((Grid_states[i+2,j] == 2) or (Grid_states[i+2,j] == 4)): # Up
+               List_neighbors.append((i+2,j))
+               
+            """
+            Left up and down
+            """
+            if (j>1) and (i<length_x) and ((Grid_states[i+1,j-2] == 2) or (Grid_states[i+1,j-2] == 4)): # Left up
+                List_neighbors.append((i+1,j-2))
+
+            if (j>1) and (i>0) and ((Grid_states[i-1,j-2] == 2) or (Grid_states[i-1,j-2] == 4)): # Left down
+                List_neighbors.append((i-1,j-2))
+                
+            """
+            Right up and down
+            """
+            if (i<length_x) and (j<length_y) and ((Grid_states[i+1,j+1] == 2) or (Grid_states[i+1,j+1] == 4)): # Right up
+                List_neighbors.append((i+1,j+1))
+                   
+            if (i>0) and (j<length_y) and ((Grid_states[i-1,j+1] == 2) or (Grid_states[i-1,j+1] ==  4)): # Right down
+                List_neighbors.append((i-1,j+1))
+                
+        if ((i>0) and (Grid_states[i-1,j] == 1)) or ((i<length_x) and (Grid_states[i+1,j] == 1)):
+        # S
+        # 3: Mo (Grid_states) Right Mo --------------------------------------------
+        # S
+ 
+            """
+            Up and down
+            """
+            if (i>1) and (Grid_states[i-2,j] == 2 or (Grid_states[i-2,j] == 4)): # Down
+                List_neighbors.append((i-2,j)) 
+               
+            if (i<length_x-1) and ((Grid_states[i+2,j] == 2) or (Grid_states[i+2,j] == 4)): # Up
+                List_neighbors.append((i+2,j)) 
+
+            """
+            Left up and down
+            """
+            if (j>0) and (i<length_x) and ((Grid_states[i+1,j-1] == 2) or (Grid_states[i+1,j-1] == 4)): # Left up
+                List_neighbors.append((i+1,j-1)) 
+            
+            if (j>0) and (i>0) and ((Grid_states[i-1,j-1] == 2) or (Grid_states[i-1,j-1] == 4)): # Left down
+                List_neighbors.append((i-1,j-1)) 
+                
+            """
+            Right up and down
+            """
+            if (i<length_x) and (j<length_y-1) and ((Grid_states[i+1,j+2] == 2) or (Grid_states[i+1,j+2] == 4)): # Right up
+                List_neighbors.append((i+1,j+2)) 
+
+                    
+            if (i>0) and (j<length_y-1) and ((Grid_states[i-1,j+2] == 2) or (Grid_states[i-1,j+2] == 4)): # Right down
+                List_neighbors.append((i-1,j+2)) 
+
+        self.List_neighbors = List_neighbors
+        return List_neighbors
 
     
     """
@@ -176,7 +262,7 @@ class Defects():
             # Kink propagation --> Zigzag
             if (((i>1) and Grid_states[i-2,j]) >= 4) or ((i<length_x-1) and (Grid_states[i+2,j] >= 4)):
                 self.allowed_events[7] = 1
-                self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                self.Act_E[6] = self.Backup_energy[0][3] # Set the nucleation energy as zigzag
                 return  # If it is part of one zigzag, it is enough
                 
             # Kink nucleation --> Armchair
@@ -201,14 +287,14 @@ class Defects():
                 if (j > 1) and (i < length_x) and (Grid_states[i+1,j-2] >= 4): # Left up
                     self.allowed_events[7] = 1
                     if (j > 2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[0][3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
     
                 if (j > 1) and (i > 0) and (Grid_states[i-1,j-2] >= 4): # Left down
                     self.allowed_events[7] = 1
                     if (j > 2) and (i > 1) and Grid_states[i-2,j-3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[0][3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                 
                     
@@ -219,13 +305,13 @@ class Defects():
                 if (i < length_x) and (j < length_y) and (Grid_states[i+1,j+1] >= 4): # Right up
                     self.allowed_events[7] = 1
                     if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[0][3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
                 if (i > 0) and (j < length_y) and (Grid_states[i-1,j+1] >= 4): # Right down
                     self.allowed_events[7] = 1
                     if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[0][3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
             
@@ -243,13 +329,13 @@ class Defects():
                 if (j>0) and (i < length_x) and (Grid_states[i+1,j-1] >= 4): # Left up
                     self.allowed_events[7] = 1
                     if (j>2) and (i < length_x - 1) and Grid_states[i+2,j-3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[0][3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                 
                 if (j>0) and (i>0) and (Grid_states[i-1,j-1] >= 4): # Left down
                     self.allowed_events[7] = 1
                     if (j > 2) and (i > 1) and Grid_states[i-2,j-3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[0][3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
                 
@@ -261,13 +347,13 @@ class Defects():
                 if (i<length_x) and (j<length_y-1) and (Grid_states[i+1,j+2] >= 4): # Right up
                     self.allowed_events[7] = 1
                     if (i < length_x - 1) and (j < length_y-2) and Grid_states[i+2,j+3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[0][3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                         
                 if (i > 0) and (j < length_y-1) and (Grid_states[i-1,j+2] >= 4): # Right down
                     self.allowed_events[7] = 1
                     if (i > 1) and (j < length_y-2) and Grid_states[i-2,j+3] >= 4: # The continuation of a diagonal zigzag row
-                        self.Act_E[6] = self.Backup_energy[3] # Set the nucleation energy as zigzag
+                        self.Act_E[6] = self.Backup_energy[0][3] # Set the nucleation energy as zigzag
                         return # If it is part of one zigzag row, it is enough
                     
                 
@@ -283,8 +369,18 @@ class Defects():
         # If the atom is surrounded by more than 2 other atoms, it is immobile
         # Minus 1 because we don't take into account the defect at the center (i,j)
         #if type(Grid_states) != np.ndarray:
-        if (i>1) and sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4))-1 > 2: return
+        #if (i>1) and sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4))-1 > 2: return
+        if i<2: return
         
+        # In case the particle form a chain --> Have particles 4 and 5 in opposite sites 
+        if (4 in Grid_states[i-2:i:1,j-2:j+3:1] and 5 in Grid_states[i+1:i+3:1,j-2:j+3:1]):
+            return
+        elif (5 in Grid_states[i-2:i:1,j-2:j+3:1] and 4 in Grid_states[i+1:i+3:1,j-2:j+3:1]): 
+            return
+        elif (4 in Grid_states[i-2:i+3:1,j-2:j:1] and 5 in Grid_states[i-2:i+3:1,j+1:j+3:1]):
+            return
+        elif (5 in Grid_states[i-2:i+3:1,j-2:j:1] and 4 in Grid_states[i-2:i+3:1,j+1:j+3:1]):
+            return
         length_x = len(Grid_states)-1
         length_y = len(Grid_states[0])-1
         atomic_specie = self.atomic_specie
@@ -293,8 +389,8 @@ class Defects():
         # We select the position supported by at least two atoms of the crystal
         # That is, the defect in the edge can't jump outside the crystal during the migration process
         # Jump outside the crystal is the detach process
-        join_cluster_ij = [x for x in join_cluster_ij if join_cluster_ij.count(x) > 1]
-        
+        join_cluster_ij = [x for x in join_cluster_ij if (join_cluster_ij.count(x) > 2) or (join_cluster_ij.count(x) == 2 and sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4))-1 >= 1)]
+        #                    or (join_cluster_ij.count(x) == 2 and sum(sum(Grid_states[i-2:i+3:1,j-2:j+3:1] >= 4))-1 == ]
         
         """
         Up and down
@@ -367,17 +463,19 @@ class Defects():
         """
         
         
-    def TR(self,T,Grid_states,join_cluster_ij):
+    def TR(self,Grid_states,join_cluster_ij):
         
         self.events_available(Grid_states,join_cluster_ij)
-        kb = 8.6173324E-5 # Boltzmann constant
-        nu0=7E13;  # nu0 (s^-1) bond vibration frequency
+        #kb = 8.6173324E-5 # Boltzmann constant
+        #nu0=7E13;  # nu0 (s^-1) bond vibration frequency
         #nu0 = 1E12 #  Shuai, Chen, Gao Junfeng, Bharathi M. Srinivasan, and Zhang Yong-Wei. "A kinetic Monte Carlo study for mono-and bi-layer growth of MoS2 during chemical vapor deposition." Acta Physico-Chimica Sinica 35, no. 10 (2019): 1119-1127.
         allowed_events = self.allowed_events
         TR = np.zeros(len(allowed_events)-1)
-            
-        TR = nu0*np.exp(-np.array(self.Act_E)/(kb*T))
-        TR[allowed_events[1:] == 0] = 0
+           
+        #TR = nu0*np.exp(-np.array(self.Act_E)/(kb*T))
+        TR[allowed_events[1:] != 0] = self.TR_list[allowed_events[1:] != 0]
+        if self.Act_E[6] == self.Backup_energy[0][3]:
+            TR[6] = self.Backup_energy[1][3]
         self.TR = TR
         
         return TR

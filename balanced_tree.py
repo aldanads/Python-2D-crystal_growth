@@ -76,7 +76,6 @@ def search_value(root,target):
     elif (root.left is not None):
         aux_l = root.left.data[0]
     
-    
     if root is None:
         return False
     

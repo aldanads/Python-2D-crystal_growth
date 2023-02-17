@@ -21,7 +21,6 @@ class Hexagonal_lattice():
         self.x_axis = device_size[0]
         self.y_axis = device_size[1]
         self.atom_colors = atom_colors
-        self.Backup_energy = Backup_energy
         self.T = T
         self.time = [0]
         self.v_adatom_flux = [[],[]]
@@ -29,6 +28,7 @@ class Hexagonal_lattice():
 
         self.create_hex_grid()
         self.pristine_crystal()
+        self.TR(Backup_energy,T)
         
 
     
@@ -397,8 +397,10 @@ class Hexagonal_lattice():
         if self.Grid_states[x,y] == self.atomic_specie:
             if self.Grid_states[x-1,y] == 0:
                 self.Grid_states[x,y] = self.defect_specie 
-                self.Grid_states[x+1,y+1] = self.defect_specie
-                self.Grid_states[x+5,y+1] = 2
+# =============================================================================
+                # self.Grid_states[x+1,y+1] = self.defect_specie
+                # self.Grid_states[x+5,y+1] = self.defect_specie
+# =============================================================================
                 self.Grid_states[x+2,y-3] = self.defect_specie
                 self.Grid_states[x-2,y-3] = self.defect_specie
                 self.Grid_states[x,y-3] = self.defect_specie 
@@ -407,8 +409,10 @@ class Hexagonal_lattice():
                 self.Grid_states[x+1,y-2] = self.defect_specie
             else:
                 self.Grid_states[x,y] = self.defect_specie 
-                self.Grid_states[x+1,y+2] = self.defect_specie
-                self.Grid_states[x+3,y+1] = 2
+# =============================================================================
+                # self.Grid_states[x+1,y+2] = self.defect_specie
+                # self.Grid_states[x+3,y+1] = self.defect_specie
+# =============================================================================
 
                 
                 self.Grid_states[x+2,y-3] = self.defect_specie
@@ -425,10 +429,14 @@ class Hexagonal_lattice():
                 
 
             if self.Grid_states[x-1,y+j] == 0:
-  
+                #print('hi')
                 self.Grid_states[x,y+j] = self.defect_specie 
+# =============================================================================
                 self.Grid_states[x+1,y+j+1] = self.defect_specie
-                self.Grid_states[x+3,y+j+1] = 2
+                # self.Grid_states[x+3,y+j+1] = self.defect_specie
+                # self.Grid_states[x+5,y+j+1] = self.defect_specie
+
+# =============================================================================
 
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
                 self.Grid_states[x-2,y+j-3] = self.defect_specie
@@ -441,8 +449,10 @@ class Hexagonal_lattice():
                 
                 self.Grid_states[x,y+j] = self.defect_specie 
                 self.Grid_states[x+1,y+j+2] = self.defect_specie
-                self.Grid_states[x+1,y+j+1] = self.defect_specie
-                self.Grid_states[x+3,y+j+1] = 2
+# =============================================================================
+                # self.Grid_states[x+1,y+j+1] = self.defect_specie
+                # self.Grid_states[x+3,y+j+1] = self.defect_specie
+# =============================================================================
 
                 
                 self.Grid_states[x+2,y+j-3] = self.defect_specie
@@ -502,6 +512,15 @@ class Hexagonal_lattice():
         
         self.v_adatom_flux[1].append(self.v_adatom_flux[0][-1]-desorpted_adatoms)
         
+    def TR(self,Backup_energy,T):
+        
+        kb = 8.6173324E-5 # Boltzmann constant
+        nu0=7E13;  # nu0 (s^-1) bond vibration frequency
+        #nu0 = 1E12 #  Shuai, Chen, Gao Junfeng, Bharathi M. Srinivasan, and Zhang Yong-Wei. "A kinetic Monte Carlo study for mono-and bi-layer growth of MoS2 during chemical vapor deposition." Acta Physico-Chimica Sinica 35, no. 10 (2019): 1119-1127.
+        
+        TR = list(nu0*np.exp(-np.array(Backup_energy)/(kb*T)))
+
+        self.Backup_energy = [Backup_energy, TR]
             
             
     
