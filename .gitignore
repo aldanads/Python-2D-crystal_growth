@@ -2,3 +2,5 @@ Master/
 __pycache__/
 video.py
 load_variables.py
+Auxiliar/
+HPC/

@@ -14,21 +14,19 @@ save_var = True
 
 #Temperature = [600, 700, 800, 900, 1000, 1100, 1200]
 etched_adsortion_rate = [0.00005,0.0001,0.00015,0.0002,0.00025,0.0003,0.00035,0.0004,0.00045,0.00050,0.00055,0.0006,0.00065]
-#etched_adsortion_rate = [0.00015] * len(Temperature)
-#non_etched_ad_rate = [0.00015] * len(etched_adsortion_rate)
-non_etched_ad_rate = [0.00015,0.0002,0.00025,0.0003,0.00035,0.0004,0.00045,0.00050,0.00055,0.0006,0.00065,0.0007,0.00075]
-
-
+#non_etched_ad_rate = [0.00015,0.0002,0.00025,0.0003,0.00035,0.0004,0.00045,0.00050,0.00055,0.0006,0.00065,0.0007,0.00075]
+#etched_adsortion_rate = [0.00035] * 5
+non_etched_ad_rate = [0.00025] * len(etched_adsortion_rate) 
 parameters = [non_etched_ad_rate,etched_adsortion_rate]
 
-for n_sim in np.arange(len(non_etched_ad_rate)):
+for n_sim in np.arange(len(parameters[0])):
 
     MoS2_lattice, MoS2_crystal,distribution_parameters,paths,rng = initialization(parameters,n_sim,save_data)
     events = [0]*15
     
     i = 0
     j = 0
-    while MoS2_crystal.coverage < 0.17:
+    while MoS2_crystal.coverage < 0.25:
         i += 1
         MoS2_lattice, MoS2_crystal,events = KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng)
 

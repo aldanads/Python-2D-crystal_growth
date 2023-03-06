@@ -13,6 +13,7 @@ from defects import Cluster
 #from datetime import datetime
 import shutil
 import os 
+import platform
 
 
 
@@ -26,7 +27,12 @@ def initialization(parameters,n_sim,save_data):
     
     if save_data:
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py']
-        dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\kMC2\Adsorption_rate_7\\'
+        
+        if platform.system() == 'Windows': # When running in laptop
+            dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\kMC2\Horizontal\\'
+        elif platform.system() == 'Linux': # HPC works on Linux
+            dst = r'/home/users/aldanads/Crystal growth/Simulations/Adsorption_rate_12/'
+            
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
         paths = {'data': ''}
@@ -44,13 +50,12 @@ def initialization(parameters,n_sim,save_data):
 # =============================================================================
 #     # Activation energies 
 # =============================================================================
-    E_mig_zigzag = 1.2 # Zigzag direction
-    E_mig_armchair = 1.2 # Armchair direction
+    E_mig_zigzag = 1 # Zigzag direction
+    E_mig_armchair = 1 # Armchair direction
 
     E_nucleation = 1.3 # Kink nucleation (1.7 eV) --> Growing in armchair direction
-    E_propagation = 1.0 # Kink propagation (1.4 eV) --> Growing in zigzag direction
-    #E_desorption = 1.52
-    E_desorption = 1.1
+    E_propagation = 0.9 # Kink propagation (1.4 eV) --> Growing in zigzag direction
+    E_desorption = 0.9
  
     
 # =============================================================================
@@ -108,7 +113,7 @@ def initialization(parameters,n_sim,save_data):
     
     # 2 regions: etched and non-etched region
     # Boundary: 'vertical', 'horizontal', 'none', diagonal right, diagonal left
-    mode = 3
+    mode = 2
     Boundary = ['vertical right', 'vertical left', 'horizontal', 'none','diagonal right', 'diagonal left']
     # Position: int - the row/column acting as a boundary and separe one region from the other
     # Position: coordinates when it is diagional boundary
@@ -137,11 +142,19 @@ def initialization(parameters,n_sim,save_data):
 def save_simulation(files_copy,dst,n_sim):
     
 
-    parent_dir = 'Sim_'+str(n_sim)+'\\'
-    os.makedirs(dst+parent_dir) 
-    dst = dst+parent_dir
-    program_directory = 'Program\\'
-    data_directoy = 'Crystal growth\\'
+    if platform.system() == 'Windows':
+        parent_dir = 'Sim_'+str(n_sim)+'\\'
+        os.makedirs(dst+parent_dir) 
+        dst = dst+parent_dir
+        program_directory = 'Program\\'
+        data_directoy = 'Crystal growth\\'
+        
+    elif platform.system() == 'Linux':
+        parent_dir = 'Sim_'+str(n_sim)+'/'
+        os.makedirs(dst+parent_dir) 
+        dst = dst+parent_dir
+        program_directory = 'Program/'
+        data_directoy = 'Crystal growth/'
 
     os.makedirs(dst + program_directory)
     os.makedirs(dst + data_directoy)
