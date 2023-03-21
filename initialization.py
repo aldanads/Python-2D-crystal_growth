@@ -31,7 +31,7 @@ def initialization(parameters,n_sim,save_data):
         if platform.system() == 'Windows': # When running in laptop
             dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\kMC2\Horizontal\\'
         elif platform.system() == 'Linux': # HPC works on Linux
-            dst = r'/home/users/aldanads/Crystal growth/Simulations/Adsorption_rate_12/'
+            dst = r'/home/users/aldanads/Crystal growth/Simulations/Growth rate -  Diffusion rate/1.2eV/'
             
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
@@ -50,8 +50,8 @@ def initialization(parameters,n_sim,save_data):
 # =============================================================================
 #     # Activation energies 
 # =============================================================================
-    E_mig_zigzag = 1 # Zigzag direction
-    E_mig_armchair = 1 # Armchair direction
+    E_mig_zigzag = 1.2 # Zigzag direction
+    E_mig_armchair = 1.2 # Armchair direction
 
     E_nucleation = 1.3 # Kink nucleation (1.7 eV) --> Growing in armchair direction
     E_propagation = 0.9 # Kink propagation (1.4 eV) --> Growing in zigzag direction
@@ -113,7 +113,7 @@ def initialization(parameters,n_sim,save_data):
     
     # 2 regions: etched and non-etched region
     # Boundary: 'vertical', 'horizontal', 'none', diagonal right, diagonal left
-    mode = 2
+    mode = 3
     Boundary = ['vertical right', 'vertical left', 'horizontal', 'none','diagonal right', 'diagonal left']
     # Position: int - the row/column acting as a boundary and separe one region from the other
     # Position: coordinates when it is diagional boundary
@@ -168,13 +168,27 @@ def save_simulation(files_copy,dst,n_sim):
 
 def save_variables(paths,variables):
     
-    import shelve
-
-    filename = 'variables'
-    my_shelf = shelve.open(paths+filename,'n') # 'n' for new
     
-    for key in variables:
-        my_shelf[key] = variables[key]
+    if platform.system() == 'Windows': # When running in laptop
 
-    my_shelf.close()
+        import shelve
+    
+        filename = 'variables'
+        my_shelf = shelve.open(paths+filename,'n') # 'n' for new
+        
+        for key in variables:
+            my_shelf[key] = variables[key]
+    
+        my_shelf.close()
 
+    elif platform.system() == 'Linux': # HPC works on Linux
+    
+        import pickle
+    
+        filename = 'variables.pkl'    
+    
+        # Open a file and use dump()
+        with open(paths+filename, 'wb') as file:
+              
+            # A new file will be created
+            pickle.dump(variables,file)
