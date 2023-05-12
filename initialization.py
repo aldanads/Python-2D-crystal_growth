@@ -26,12 +26,12 @@ def initialization(parameters,n_sim,save_data):
     plt.rcParams["figure.dpi"] = 300 # Default value of dpi = 300
     
     if save_data:
-        files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py']
+        files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py','balanced_tree.py']
         
         if platform.system() == 'Windows': # When running in laptop
-            dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\kMC2\Horizontal\\'
+            dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\kMC2\Fixed time\t=0.0003\\'
         elif platform.system() == 'Linux': # HPC works on Linux
-            dst = r'/home/users/aldanads/Crystal growth/Simulations/Growth rate -  Diffusion rate/1.2eV/'
+            dst = r'/home/users/aldanads/Crystal growth/Simulations/2 domains - Desorption/Vertical right/1.3 eV/'
             
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
@@ -50,12 +50,15 @@ def initialization(parameters,n_sim,save_data):
 # =============================================================================
 #     # Activation energies 
 # =============================================================================
-    E_mig_zigzag = 1.2 # Zigzag direction
-    E_mig_armchair = 1.2 # Armchair direction
+    E_mig_zigzag = 1 # Zigzag direction
+    E_mig_armchair = 1 # Armchair direction
+    E_mig_2 = E_mig_zigzag
 
     E_nucleation = 1.3 # Kink nucleation (1.7 eV) --> Growing in armchair direction
     E_propagation = 0.9 # Kink propagation (1.4 eV) --> Growing in zigzag direction
     E_desorption = 0.9
+    
+    E_desorption_2 = 1.3
  
     
 # =============================================================================
@@ -66,10 +69,10 @@ def initialization(parameters,n_sim,save_data):
 #     ACS applied materials & interfaces 11, no. 45 (2019): 42751-42759.
 # =============================================================================
 
-    E_mig_armchair_edge = 1.3 # Armchair direction
-    E_mig_zigzag_edge = 1.3 # Zigzag direction
+    E_mig_armchair_edge = 1.5 # Armchair direction
+    E_mig_zigzag_edge = 1.5 # Zigzag direction
     
-    Backup_energy = [E_mig_zigzag,E_mig_armchair,E_nucleation,E_propagation,E_desorption,E_mig_zigzag_edge,E_mig_armchair_edge]
+    Backup_energy = [E_mig_zigzag,E_mig_armchair,E_nucleation,E_propagation,E_desorption,E_mig_zigzag_edge,E_mig_armchair_edge,E_mig_2,E_desorption_2]
     
     # Temperature
     T = 1108
@@ -113,15 +116,21 @@ def initialization(parameters,n_sim,save_data):
     
     # 2 regions: etched and non-etched region
     # Boundary: 'vertical', 'horizontal', 'none', diagonal right, diagonal left
-    mode = 3
+    mode = 0
     Boundary = ['vertical right', 'vertical left', 'horizontal', 'none','diagonal right', 'diagonal left']
+    parameter_mode = 2
+    key_parameter = ['adsorption rate','migration substrate','desorption']
     # Position: int - the row/column acting as a boundary and separe one region from the other
     # Position: coordinates when it is diagional boundary
     diagonal_right = [(int(i),int(i)) for i in np.arange(2 * device_size[0]/a - 1)]
     diagonal_left = [(int(2 * device_size[0]/a-1 - i),int(i)) for i in np.arange(2 * device_size[0]/a - 1)]
     Position = [round(len(xv[0])/2),round(len(xv[0])/2),round(len(xv[0])/2),round(len(xv[0])/2),diagonal_right,diagonal_left]
-    split_regions = {'Boundary' : Boundary[mode], 'Position': Position[mode], 'ad_rate': parameters[1][n_sim]}
     
+    if key_parameter[parameter_mode] == 'adsorption rate':
+        split_regions = {'Boundary' : Boundary[mode], 'Position': Position[mode], 'ad_rate': parameters[1][n_sim], 'key_parameter': key_parameter[parameter_mode]}
+    else:
+        split_regions = {'Boundary' : Boundary[mode], 'Position': Position[mode], 'ad_rate': parameters[0][n_sim], 'key_parameter': key_parameter[parameter_mode]}
+
 
     prob_defects = parameters[0][n_sim]
     crystal_orientation = True

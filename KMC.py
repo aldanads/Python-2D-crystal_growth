@@ -17,6 +17,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
     time = 0
     previous_step_desorption = events[8]
     pair_atom_defect = distribution_parameters[3]
+    split_regions = distribution_parameters[5]
     
     MoS2_lattice.defect_distributions(distribution_parameters)
     
@@ -51,7 +52,7 @@ def KMC(MoS2_lattice, MoS2_crystal,distribution_parameters,events,rng):
         for key in Dict_defects:
             if Dict_defects[key] == None:
                 
-                Dict_defects[key] = Defects(key[0],key[1],MoS2_lattice.Backup_energy,pair_atom_defect[0],T,Grid_states,MoS2_crystal.join_cluster_ij)
+                Dict_defects[key] = Defects(key[0],key[1],MoS2_lattice.Backup_energy,pair_atom_defect[0],T,Grid_states,MoS2_crystal.join_cluster_ij,split_regions)
             
             TR.extend([(Dict_defects[key].TR[j],j,key) for j in np.arange(len(Dict_defects[key].TR)) if Dict_defects[key].TR[j] != 0.0])
 

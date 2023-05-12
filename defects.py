@@ -9,29 +9,14 @@ import numpy as np
 class Defects():
     
     
-    def __init__(self,i,j,Backup_energy,atomic_specie,T,Grid_states,join_cluster_ij):
+    def __init__(self,i,j,Backup_energy,atomic_specie,T,Grid_states,join_cluster_ij,split_regions):
         
         self.i = i
         self.j = j
         self.Backup_energy = Backup_energy
-        # Backup_energy[0] - zigzag
-        # Backup_energy[1] - armchair
-        # Backup_energy[2] - nucleation
-        # Backup_energy[3] - propagation
-        # Backup_energy[4] - desorption
-        # Backup_energy[5] - E_mig_zigzag_edge
-        # Backup_energy[6] - E_mig_armchair_edge
 
-        self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],
-                     Backup_energy[0][2],
-                     Backup_energy[0][4],
-                     Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]]
-
-        self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],
-                     Backup_energy[1][2],
-                     Backup_energy[1][4],
-                     Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]])
-
+        self.energy_sets(i,j,Backup_energy,split_regions)
+        
         self.atomic_specie = atomic_specie
         self.defect_specie = Grid_states[i,j]
         
@@ -43,7 +28,184 @@ class Defects():
     """
     ---------------- Calculate neighbors -------------------------
     """
+    
+    def energy_sets(self,i,j,Backup_energy,split_regions):
         
+        # Backup_energy[0] - zigzag
+        # Backup_energy[1] - armchair
+        # Backup_energy[2] - nucleation
+        # Backup_energy[3] - propagation
+        # Backup_energy[4] - desorption
+        # Backup_energy[5] - E_mig_zigzag_edge
+        # Backup_energy[6] - E_mig_armchair_edge
+        
+        if split_regions['key_parameter'] == 'adsorption rate':
+
+            self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                     Backup_energy[0][2], # Nucleation/Propagation
+                     Backup_energy[0][4], # Desorption
+                     Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+          
+            self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                     Backup_energy[1][2], # Nucleation/Propagation
+                     Backup_energy[1][4], # Desorption
+                     Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+        elif split_regions['key_parameter'] == 'migration substrate':
+            
+            if split_regions['Boundary'] == 'vertical right':
+                
+                if j > split_regions['Position']: 
+                
+                    self.Act_E =[Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][4], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                  
+                    self.TR_list= np.array([Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][4], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+                else:
+                    
+                    self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][4], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                  
+                    self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][4], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+                
+            elif split_regions['Boundary'] == 'vertical left':
+                
+                if j < split_regions['Position']: 
+                    
+                    self.Act_E =[Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][4], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                 
+                    self.TR_list= np.array([Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][4], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+                else:
+                    
+                    self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][4], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+      
+                    self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][4], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+            elif split_regions['Boundary'] == 'horizontal':
+                
+                if i > split_regions['Position']: 
+                    self.Act_E =[Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7],Backup_energy[0][7], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][4], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                  
+                    self.TR_list= np.array([Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7],Backup_energy[1][7], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][4], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+                else:
+                    
+                    self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][4], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+      
+                    self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][4], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+        elif split_regions['key_parameter'] == 'desorption':
+            
+            if split_regions['Boundary'] == 'vertical right':
+                
+                if j > split_regions['Position']: 
+                    self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][8], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                  
+                    self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][8], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+                else:
+                    
+                    self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][4], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                  
+                    self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][4], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+            if split_regions['Boundary'] == 'vertical left':
+                
+                if j < split_regions['Position']: 
+                    self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][8], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                  
+                    self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][8], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+                else:
+                    
+                    self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][4], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                  
+                    self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][4], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+            if split_regions['Boundary'] == 'horizontal':
+                
+                if i > split_regions['Position']:  
+                    self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][8], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                  
+                    self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][8], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+                else:
+                    
+                    self.Act_E =[Backup_energy[0][0],Backup_energy[0][0],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1],Backup_energy[0][1], # Migration at the substrate
+                             Backup_energy[0][2], # Nucleation/Propagation
+                             Backup_energy[0][4], # Desorption
+                             Backup_energy[0][5],Backup_energy[0][5],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6],Backup_energy[0][6]] # Migration at the edge
+                  
+                    self.TR_list= np.array([Backup_energy[1][0],Backup_energy[1][0],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1],Backup_energy[1][1], # Migration substrate
+                             Backup_energy[1][2], # Nucleation/Propagation
+                             Backup_energy[1][4], # Desorption
+                             Backup_energy[1][5],Backup_energy[1][5],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6],Backup_energy[1][6]]) # Migration at the edge
+
+    
     
     def neighbors(self,i,j,Grid_states):
         
@@ -473,7 +635,11 @@ class Defects():
         TR = np.zeros(len(allowed_events)-1)
            
         #TR = nu0*np.exp(-np.array(self.Act_E)/(kb*T))
+        print(len(TR))
+        print(len(self.TR_list))
+        print(len(allowed_events))
         TR[allowed_events[1:] != 0] = self.TR_list[allowed_events[1:] != 0]
+        
         if self.Act_E[6] == self.Backup_energy[0][3]:
             TR[6] = self.Backup_energy[1][3]
         self.TR = TR
