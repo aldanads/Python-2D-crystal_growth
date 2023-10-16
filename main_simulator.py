@@ -14,8 +14,10 @@ save_var = True
 
 #Temperature = [600, 700, 800, 900, 1000, 1100, 1200]
 #etched_adsortion_rate = [0.00005,0.0001,0.00015,0.0002,0.00025,0.0003,0.00035,0.0004,0.00045,0.00050,0.00055,0.0006,0.00065]
-non_etched_ad_rate = [0.00015, 0.00021667, 0.00028333, 0.00035, 0.00041667, 0.00048333, 0.00055, 0.00061667, 0.00068333, 0.00075]
-etched_adsortion_rate = [0.0002] * len(non_etched_ad_rate)
+#non_etched_ad_rate = [15e-5, 22e-5, 28e-5, 35e-5, 42e-5, 48e-5, 55e-5, 62e-5, 68e-5, 75e-5]
+non_etched_ad_rate = [1e-5, 2e-5, 3e-5, 5e-5, 10e-5, 15e-5, 20e-5, 25e-5, 30e-5]
+
+etched_adsortion_rate = [3e-5] * len(non_etched_ad_rate)
 #non_etched_ad_rate = [0.0002] * 10 
 parameters = [non_etched_ad_rate,etched_adsortion_rate]
 

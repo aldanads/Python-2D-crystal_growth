@@ -29,9 +29,9 @@ def initialization(parameters,n_sim,save_data):
         files_copy = ['defects.py', 'hex_lattice.py', 'initialization.py','KMC.py','main_simulator.py','load_variables.py','balanced_tree.py']
         
         if platform.system() == 'Windows': # When running in laptop
-            dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\kMC2\Fixed time\t=0.0003\\'
+            dst = r'C:\Users\aldanads\OneDrive - TCDUD.onmicrosoft.com\2D device simulator project\Publications\Layer growth\Simulations\Sulfur limited process\Vertical right_mig\\'
         elif platform.system() == 'Linux': # HPC works on Linux
-            dst = r'/home/users/aldanads/Crystal growth/Simulations/2 domains - Desorption/Vertical right/1.3 eV/'
+            dst = r'/home/users/aldanads/Crystal growth/Simulations/Migration edge/1.2 eV/'
             
         paths = save_simulation(files_copy,dst,n_sim) # Create folders and python files
     else:
@@ -50,15 +50,15 @@ def initialization(parameters,n_sim,save_data):
 # =============================================================================
 #     # Activation energies 
 # =============================================================================
-    E_mig_zigzag = 1 # Zigzag direction
-    E_mig_armchair = 1 # Armchair direction
-    E_mig_2 = E_mig_zigzag
+    E_mig_zigzag = 0.4 # Zigzag direction
+    E_mig_armchair = 0.4 # Armchair direction
+    E_mig_2 = E_mig_zigzag #2nd region
 
-    E_nucleation = 1.3 # Kink nucleation (1.7 eV) --> Growing in armchair direction
-    E_propagation = 0.9 # Kink propagation (1.4 eV) --> Growing in zigzag direction
-    E_desorption = 0.9
+    E_nucleation = 0.7 # Kink nucleation (1.7 eV) --> Growing in armchair direction
+    E_propagation = 0.44 # Kink propagation (1.4 eV) --> Growing in zigzag direction
+    E_desorption = 0.6
     
-    E_desorption_2 = 1.3
+    E_desorption_2 = 0.2 # 2nd region
  
     
 # =============================================================================
@@ -69,8 +69,8 @@ def initialization(parameters,n_sim,save_data):
 #     ACS applied materials & interfaces 11, no. 45 (2019): 42751-42759.
 # =============================================================================
 
-    E_mig_armchair_edge = 1.5 # Armchair direction
-    E_mig_zigzag_edge = 1.5 # Zigzag direction
+    E_mig_armchair_edge = 1 # Armchair direction
+    E_mig_zigzag_edge = 1 # Zigzag direction
     
     Backup_energy = [E_mig_zigzag,E_mig_armchair,E_nucleation,E_propagation,E_desorption,E_mig_zigzag_edge,E_mig_armchair_edge,E_mig_2,E_desorption_2]
     

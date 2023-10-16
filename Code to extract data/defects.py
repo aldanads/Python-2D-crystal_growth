@@ -635,7 +635,9 @@ class Defects():
         TR = np.zeros(len(allowed_events)-1)
            
         #TR = nu0*np.exp(-np.array(self.Act_E)/(kb*T))
-
+        print(len(TR))
+        print(len(self.TR_list))
+        print(len(allowed_events))
         TR[allowed_events[1:] != 0] = self.TR_list[allowed_events[1:] != 0]
         
         if self.Act_E[6] == self.Backup_energy[0][3]:
